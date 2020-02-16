@@ -1,5 +1,6 @@
 import gym
-env = gym.make('MontezumaRevenge-ram-v0')
+envs = ['MontezumaRevenge-ram-v0', 'Breakout-v0']
+env = gym.make(envs[1])
 print(env.action_space)
 print(env.observation_space)
 for i_episode in range(1):

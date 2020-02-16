@@ -400,6 +400,7 @@ target_estimator = Estimator(scope="target_q")
 # State processor
 state_processor = StateProcessor()
 
+
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     for t, stats in deep_q_learning(sess,
@@ -410,7 +411,7 @@ with tf.Session() as sess:
                                     experiment_dir=experiment_dir,
                                     num_episodes=10000,
                                     replay_memory_size=500000,
-                                    replay_memory_init_size=50000,
+                                    replay_memory_init_size=500,
                                     update_target_estimator_every=10000,
                                     epsilon_start=1.0,
                                     epsilon_end=0.1,

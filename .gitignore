@@ -1,3 +1,4 @@
 dqn/experiments/
 gymenv/
 .idea/
+*.pyc
