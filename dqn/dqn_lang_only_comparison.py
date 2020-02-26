@@ -9,6 +9,7 @@ import tensorflow as tf
 import plotting
 import params
 from collections import deque, namedtuple
+import time
 
 if "../" not in sys.path:
     sys.path.append("../")
@@ -371,8 +372,6 @@ class Runner:
             for t in range(10000):
                 self.env.render()
                 # Get action
-                ### TODO: get action instead of sampling
-
                 action_probs = self.policy(self.sess, state,
                                            self.epsilons [min(self.total_t, self.params.epsilon_decay_steps - 1)])
                 action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
@@ -385,8 +384,7 @@ class Runner:
                     break
                 else:
                     state = next_state
-
-                input()
+                time.sleep(1/24)
                 if done:
                     break
 
@@ -400,7 +398,7 @@ _q_estimator = Estimator(scope="q", summaries_dir=experiment_dir)
 _target_estimator = Estimator(scope="target_q")
 
 # State processor
-_state_processor = StateProcessor()
+_state_processor = StateProcessor(_env)
 
 with tf.Session() as _sess:
     _sess.run(tf.global_variables_initializer())

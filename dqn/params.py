@@ -1,16 +1,21 @@
 import os
+from collections import namedtuple
 
-envs = {0: 'Breakout-v0',
-        1: 'MontezumaRevenge-ram-v0',
-        2: 'CartPole-v0'}
+EnvInfo = namedtuple("EnvInfo", ["name", "offset_height", "offset_width", "target_height", "target_width"])
+
+envs = {0: EnvInfo('Breakout-v0', 34, 0, 160, 160),
+        1: EnvInfo('MontezumaRevenge-v0', 34, 0, 160, 160),
+        2: EnvInfo('Pong-v0', 34, 0, 160, 160),
+        3: EnvInfo('MsPacman-v0', 0, 0, 160, 160),
+        4: EnvInfo('SpaceInvaders-v0', 0, 0, 210, 160)}
 
 class Config:
     def __init__(self):
 
         # Modes
-        self.is_train = False
-        self.is_debug = True
-        self.env_idx = 0
+        self.is_train = True
+        self.is_debug = False
+        self.env_idx = 1
         self.env_name = None
         self.use_emb = False
 
@@ -18,7 +23,7 @@ class Config:
         self.num_episodes = 10000
 
         # Learning algorithm parameters
-        self.replay_memory_size = 500000
+        self.replay_memory_size = 100000
         self.replay_memory_init_size = 50000
         self.update_target_estimator_every = 10000
         self.epsilon_start = 1.0
@@ -28,8 +33,11 @@ class Config:
         self.batch_size = 32
         self.record_video_every = 50
 
+        # Model parameters
+        self.embedding_dim = 300
+
         # Paths
-        self.emb_path = "./data/emb_file"   # TODO: Change to real emb file
+        self.emb_path = None   # TODO: Change to real emb file
         self.vocab_path = "./data/vocab_10000.txt"
         self.experiment_dir = os.path.abspath("./experiments/{}".format(envs[self.env_idx]))
         self.checkpoint_dir = os.path.join(self.experiment_dir, "checkpoints")

@@ -19,7 +19,6 @@ _config = params.get_params()
 
 _env = gym.envs.make(_config.env_name)
 
-# Atari Actions: 0 (noop), 1 (fire), 2 (left) and 3 (right) are valid actions
 # VALID_ACTIONS = [0, 1, 2, 3]
 VALID_ACTIONS = list(range(_env.action_space.n))
 
@@ -38,7 +37,7 @@ vocabulary = ["<PAD>", "<UNK>"] + vocabulary
 word_indices = dict(zip(vocabulary, range(len(vocabulary))))
 
 n = len(word_indices)
-m = _config["word_embedding_dim"]
+m = _config.embedding_dim
 emb = np.empty((n, m), dtype=np.float32)
 
 emb[:, :] = np.random.normal(size=(n, m))
@@ -64,11 +63,11 @@ class StateProcessor:
     """
     Processes a raw Atari images. Resizes it and converts it to grayscale.
     """
-    def __init__(self):
+    def __init__(self, env):
 
         # Build the Tensorflow graph
         with tf.variable_scope("state_processor"):
-            self.input_state = tf.placeholder(shape=[210, 160, 3], dtype=tf.uint8)
+            self.input_state = tf.placeholder(shape=env.observation_space.shape, dtype=tf.uint8)
             self.output = tf.image.rgb_to_grayscale(self.input_state)
             self.output = tf.image.crop_to_bounding_box(self.output, 34, 0, 160, 160)
             self.output = tf.image.resize_images(
@@ -456,7 +455,7 @@ _q_estimator = Estimator(emb, scope="q", summaries_dir=_config.experiment_dir)
 _target_estimator = Estimator(emb, scope="target_q")
 
 # State processor
-_state_processor = StateProcessor()
+_state_processor = StateProcessor(_env)
 
 with tf.Session() as _sess:
     _sess.run(tf.global_variables_initializer())
