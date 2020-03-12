@@ -15,7 +15,7 @@ class Config:
         # Modes
         self.is_train = True
         self.is_debug = False
-        self.env_idx = 1
+        self.env_idx = 2
         self.env_name = None
         self.use_emb = False
 
@@ -39,7 +39,7 @@ class Config:
         # Paths
         self.emb_path = None   # TODO: Change to real emb file
         self.vocab_path = "./data/vocab_10000.txt"
-        self.experiment_dir = os.path.abspath("./experiments/{}".format(envs[self.env_idx]))
+        self.experiment_dir = os.path.abspath("./experiments/{}".format(envs[self.env_idx].name))
         self.checkpoint_dir = os.path.join(self.experiment_dir, "checkpoints")
         self.checkpoint_path = os.path.join(self.checkpoint_dir, "model")
         self.monitor_path = os.path.join(self.experiment_dir, "monitor")
@@ -47,7 +47,7 @@ class Config:
         self.preprocess()
 
     def preprocess(self):
-        self.env_name = envs[self.env_idx]
+        self.env_name = envs[self.env_idx].name
         if self.is_debug:
             self.replay_memory_init_size = 500
         if self.use_emb:

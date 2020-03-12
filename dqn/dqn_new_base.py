@@ -8,8 +8,9 @@ import sys
 import tensorflow as tf
 import plotting
 import params
+import scipy
 from collections import deque, namedtuple
-import time
+from nn_utils import attention
 
 if "../" not in sys.path:
     sys.path.append("../")
@@ -18,38 +19,55 @@ _config = params.get_params()
 
 _env = gym.envs.make(_config.env_name)
 
-# Atari Actions: 0 (noop), 1 (fire), 2 (left) and 3 (right) are valid actions
 # VALID_ACTIONS = [0, 1, 2, 3]
 VALID_ACTIONS = list(range(_env.action_space.n))
 
-# Where we save our checkpoints and graphs
-experiment_dir = os.path.abspath("./experiments/{}".format(_env.spec.id))
-checkpoint_dir = os.path.join(experiment_dir, "checkpoints")
-checkpoint_path = os.path.join(checkpoint_dir, "model")
-monitor_path = os.path.join(experiment_dir, "monitor")
+# Create directories
+if not os.path.exists(_config.checkpoint_dir):
+    os.makedirs(_config.checkpoint_dir)
+if not os.path.exists(_config.monitor_path):
+    os.makedirs(_config.monitor_path)
 
-_config.experiment_dir = experiment_dir
-_config.checkpoint_dir = checkpoint_dir
-_config.checkpoint_path = checkpoint_path
-_config.monitor_path = monitor_path
+vocabulary = []
+with open(_config.vocab_path, 'r') as f:
+    for index, line in enumerate(f):
+        vocabulary.append(line.strip())
 
-if not os.path.exists(checkpoint_dir):
-    os.makedirs(checkpoint_dir)
-if not os.path.exists(monitor_path):
-    os.makedirs(monitor_path)
+vocabulary = ["<PAD>", "<UNK>"] + vocabulary
+word_indices = dict(zip(vocabulary, range(len(vocabulary))))
+
+n = len(word_indices)
+m = _config.embedding_dim
+emb = np.empty((n, m), dtype=np.float32)
+
+emb[:, :] = np.random.normal(size=(n, m))
+# Explicitly assign embedding of <PAD> to be zeros.
+emb[0:2, :] = np.zeros((1, m), dtype="float32")
+
+if _config.emb_path:
+    with open(_config.emb_path, 'r') as f:
+        for i, line in enumerate(f):
+            s = line.split()
+            if s[0] in word_indices:
+                emb[word_indices[s[0]], :] = np.asarray(s[1:])
+    print("Embedding matrix loaded. Length: {}".format(len(emb)))
+else:
+    print("No embedding loaded.")
 
 Transition = namedtuple("Transition", ["state", "action", "reward", "next_state", "done"])
 
 IS_TRAIN = _config.is_train
 
-class StateProcessor():
+
+class StateProcessor:
     """
     Processes a raw Atari images. Resizes it and converts it to grayscale.
     """
     def __init__(self, env):
+
         # Build the Tensorflow graph
         with tf.variable_scope("state_processor"):
-            self.input_state = tf.placeholder(shape=[210, 160, 3], dtype=tf.uint8)
+            self.input_state = tf.placeholder(shape=env.observation_space.shape, dtype=tf.uint8)
             self.output = tf.image.rgb_to_grayscale(self.input_state)
             self.output = tf.image.crop_to_bounding_box(self.output, 34, 0, 160, 160)
             self.output = tf.image.resize_images(
@@ -69,7 +87,16 @@ class StateProcessor():
 
 
 class Estimator():
-    def __init__(self, scope="estimator", summaries_dir=None):
+    def __init__(self, emb_mat, scope="estimator", summaries_dir=None):
+
+        # TODO: Get these args from config
+        self.emb_size = 300
+        self.lstm_size = 300
+        self.max_len = 30
+        self.vocab_size = 10000
+        self.attention_size = 128
+
+        self.embedding = emb_mat
         self.scope = scope
         # Writes Tensorboard summaries to disk
         self.summary_writer = None
@@ -108,11 +135,7 @@ class Estimator():
 
         # Fully connected layers
         flattened = tf.contrib.layers.flatten(conv3)
-        fc1 = tf.contrib.layers.fully_connected(flattened, 512)
-
-        # TODO: Language generation model here:
-        with tf.variable_scope("language_model"):
-            pass
+        fc1 = tf.contrib.layers.fully_connected(flattened, len(VALID_ACTIONS))
 
         self.predictions = tf.contrib.layers.fully_connected(fc1, len(VALID_ACTIONS))
 
@@ -148,7 +171,14 @@ class Estimator():
           Tensor of shape [batch_size, NUM_VALID_ACTIONS] containing the estimated
           action values.
         """
-        return sess.run(self.predictions, { self.X_pl: s })
+        return sess.run(self.predictions, {self.X_pl: s})
+
+    def predict_sentence_raw(self, sess, s):
+        return sess.run(self.sentence_repr, {self.X_pl: s})
+
+    def predict_sentence(self, sess, s):
+        sentence_raw = self.predict_sentence_raw(sess, s)
+        sentence_idx = np.argmax(sentence_raw, axis=-1)
 
     def update(self, sess, s, a, y):
         """
@@ -236,7 +266,7 @@ class Runner:
                 episode_lengths=np.zeros(config.num_episodes),
                 episode_rewards=np.zeros(config.num_episodes))
 
-        latest_checkpoint = tf.train.latest_checkpoint(checkpoint_dir)
+        latest_checkpoint = tf.train.latest_checkpoint(config.checkpoint_dir)
         if latest_checkpoint:
             print("Loading model checkpoint {}...\n".format(latest_checkpoint))
             self.saver.restore(sess, latest_checkpoint)
@@ -272,14 +302,14 @@ class Runner:
     def train(self):
 
         self.env = Monitor(self.env,
-                           directory=monitor_path,
+                           directory=self.params.monitor_path,
                            resume=True,
                            video_callable=lambda count: count % self.params.record_video_every == 0)
 
         for i_episode in range(self.params.num_episodes):
 
             # Save the current checkpoint
-            self.saver.save(tf.get_default_session(), checkpoint_path)
+            self.saver.save(tf.get_default_session(), self.params.checkpoint_path)
 
             # Reset the environment
             state = self.env.reset()
@@ -373,18 +403,22 @@ class Runner:
                 self.env.render()
                 # Get action
                 action_probs = self.policy(self.sess, state,
-                                           self.epsilons [min(self.total_t, self.params.epsilon_decay_steps - 1)])
+                                           self.epsilons[min(self.total_t, self.params.epsilon_decay_steps - 1)])
                 action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
                 next_state, reward, done, _ = self.env.step(VALID_ACTIONS[action])
                 next_state = self.state_processor.process(self.sess, next_state)
                 next_state = np.append(state [:, :, 1:], np.expand_dims(next_state, 2), axis=2)
                 self.replay_memory.append(Transition(state, action, reward, next_state, done))
+
+                output_sentence = self.q_estimator.predict_sentence(self.sess, tf.expand_dims(state, 0))
+
                 if done:
                     print("Episode finished after {} timesteps".format(t+1))
                     break
                 else:
                     state = next_state
-                time.sleep(1/24)
+
+                input()
                 if done:
                     break
 
@@ -394,8 +428,8 @@ tf.reset_default_graph()
 global_step = tf.Variable(0, name='global_step', trainable=False)
 
 # Create estimators
-_q_estimator = Estimator(scope="q", summaries_dir=experiment_dir)
-_target_estimator = Estimator(scope="target_q")
+_q_estimator = Estimator(emb, scope="q", summaries_dir=_config.experiment_dir)
+_target_estimator = Estimator(emb, scope="target_q")
 
 # State processor
 _state_processor = StateProcessor(_env)
