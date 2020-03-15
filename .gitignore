@@ -5,3 +5,6 @@ gymenv/
 .idea/
 *.pyc
 conda
+
+rl_a3c_pytorch/trained_models
+rl_a3c_pytorch/trained_models_official
