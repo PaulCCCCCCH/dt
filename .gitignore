@@ -1,10 +1,12 @@
-dqn/experiment*/
-dqn/data/glove.840B.300d.txt
+*experiment*
+*glove.840B.300d.txt*
 
-gymenv/
+*/gymenv/
 .idea/
 *.pyc
 conda
+emb/
 
-rl_a3c_pytorch/trained_models
-rl_a3c_pytorch/trained_models_official
+montezuma_data
+*results_baseline*
+*trained_models*

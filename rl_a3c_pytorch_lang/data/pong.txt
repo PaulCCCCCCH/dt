@@ -1,0 +1,100 @@
+0%%%movement dont move
+0%%%dont propel
+0%%%dont move
+0%%%stop
+0%%%stoppage stop
+0%%%stay where you are
+0%%%stay are you where
+0%%%arrest where you are
+0%%%be stay where you are
+0%%%practice do nothing
+0%%%do nothing
+0%%%do zip
+0%%%nothing do
+0%%%dont go anywhere
+0%%%dont go anyplace
+0%%%anywhere go dont
+0%%%anything do dont
+0%%%dont do anything
+0%%%dont do practice anything
+2%%%upwards up
+2%%%up
+2%%%high pitched
+2%%%higher
+2%%%up
+2%%%go up
+2%%%live on up
+2%%%upwards go up
+2%%%movement move upwards
+2%%%upwards move
+2%%%upwards
+2%%%move upwards
+2%%%kick the bucket higher
+2%%%go higher
+2%%%gamy go higher
+2%%%move in high spirits
+2%%%move higher
+2%%%move movement higher
+2%%%move to a higher position
+2%%%move higher position
+2%%%move to a in high spirits position
+2%%%move to a position higher
+2%%%go to a higher
+2%%%go to a higher position
+2%%%crack to a higher position
+2%%%go gamy to a higher position
+2%%%move a to higher location
+2%%%move to a gamy location
+2%%%move to higher
+2%%%move to a higher location
+2%%%rise
+2%%%ascend
+2%%%move upwards up
+2%%%move up
+2%%%make a motion up
+2%%%upwards travel
+2%%%travel upwardly
+2%%%travel travelling upwards
+2%%%travel upwards
+2%%%travel up
+2%%%upwards travel up
+2%%%jaunt up
+3%%%down
+3%%%run short down
+3%%%go down
+3%%%down go
+3%%%move downwards
+3%%%downwards move
+3%%%movement move downwards
+3%%%go lower
+3%%%lower go
+3%%%go turn down
+3%%%lower move
+3%%%move downcast lower
+3%%%move lower
+3%%%move to downcast a lower position
+3%%%get to a lower position
+3%%%move to a lower position
+3%%%lower to a move position
+3%%%go angstrom to a lower position
+3%%%to a lower position
+3%%%go to a lower position
+3%%%go to a lower berth
+3%%%move to a lower angstrom location
+3%%%move a to lower location
+3%%%move to a lower location
+3%%%go down descend
+3%%%fall
+3%%%descend
+3%%%downcast lower
+3%%%depress
+3%%%lower
+3%%%lower move
+3%%%move lower
+3%%%move low down
+3%%%travel downwardly downwards
+3%%%go downwards
+3%%%travel downwards
+3%%%jaunt down
+3%%%travel down
+3%%%down travel

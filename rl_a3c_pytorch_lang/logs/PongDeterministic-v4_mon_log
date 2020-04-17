@@ -1,0 +1,13 @@
+2020-04-15 15:43:32,485 : env: PongDeterministic-v4
+2020-04-15 15:43:32,485 : env_config: config.json
+2020-04-15 15:43:32,485 : num_episodes: 100
+2020-04-15 15:43:32,485 : load_model_dir: trained_models/
+2020-04-15 15:43:32,485 : log_dir: logs/
+2020-04-15 15:43:32,486 : emb_path: ../emb/model.bin
+2020-04-15 15:43:32,486 : render: True
+2020-04-15 15:43:32,486 : render_freq: 1
+2020-04-15 15:43:32,486 : max_episode_length: 10000
+2020-04-15 15:43:32,486 : gpu_id: -1
+2020-04-15 15:43:32,486 : skip_rate: 4
+2020-04-15 15:43:32,486 : seed: 1
+2020-04-15 15:43:32,486 : new_gym_eval: False

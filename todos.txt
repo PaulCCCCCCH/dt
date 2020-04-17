@@ -1,0 +1,2 @@
+1. Language cannot be the only source of state repr. Try concatenating it with the original state repr.
+2. Pre-train the language model and / or the A3C model alone.

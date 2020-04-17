@@ -1,0 +1,91 @@
+2020-04-07 22:52:33,395 : lr: 0.0001
+2020-04-07 22:52:33,395 : gamma: 0.99
+2020-04-07 22:52:33,395 : tau: 1.0
+2020-04-07 22:52:33,395 : seed: 1
+2020-04-07 22:52:33,395 : workers: 8
+2020-04-07 22:52:33,395 : num_steps: 20
+2020-04-07 22:52:33,395 : max_episode_length: 10000
+2020-04-07 22:52:33,395 : env: PongDeterministic-v4
+2020-04-07 22:52:33,395 : env_config: config.json
+2020-04-07 22:52:33,395 : shared_optimizer: True
+2020-04-07 22:52:33,395 : load: False
+2020-04-07 22:52:33,395 : save_max: True
+2020-04-07 22:52:33,396 : optimizer: Adam
+2020-04-07 22:52:33,396 : load_model_dir: trained_models/
+2020-04-07 22:52:33,396 : save_model_dir: trained_models/
+2020-04-07 22:52:33,396 : log_dir: logs/
+2020-04-07 22:52:33,396 : emb_path: ../emb/model.bin
+2020-04-07 22:52:33,396 : gpu_ids: [0]
+2020-04-07 22:52:33,396 : amsgrad: True
+2020-04-07 22:52:33,396 : skip_rate: 4
+2020-04-07 22:52:38,026 : Time 00h 00m 04s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:52:54,055 : Time 00h 00m 20s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:53:10,190 : Time 00h 00m 36s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:53:26,287 : Time 00h 00m 52s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:53:42,362 : Time 00h 01m 08s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:53:58,453 : Time 00h 01m 24s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:54:14,499 : Time 00h 01m 40s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:54:30,505 : Time 00h 01m 56s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:54:46,666 : Time 00h 02m 13s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:55:02,993 : Time 00h 02m 29s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:55:19,087 : Time 00h 02m 45s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:55:35,058 : Time 00h 03m 01s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:55:51,261 : Time 00h 03m 17s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:56:07,382 : Time 00h 03m 33s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:56:23,733 : Time 00h 03m 50s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:56:39,865 : Time 00h 04m 06s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:56:56,020 : Time 00h 04m 22s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:57:12,151 : Time 00h 04m 38s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:57:27,736 : Time 00h 04m 54s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:57:43,778 : Time 00h 05m 10s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 22:57:59,994 : Time 00h 05m 26s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 23:00:59,979 : Time 00h 08m 26s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-07 23:02:43,334 : Time 00h 10m 09s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:11:12,391 : Time 01h 18m 38s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:11:27,701 : Time 01h 18m 54s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:11:42,913 : Time 01h 19m 09s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:11:58,286 : Time 01h 19m 24s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:12:13,236 : Time 01h 19m 39s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-08 00:12:36,001 : Time 01h 20m 02s, episode reward -21.0, episode length 1878, reward mean -21.0000
+2020-04-08 00:13:19,223 : Time 01h 20m 45s, episode reward -21.0, episode length 824, reward mean -21.0000
+2020-04-08 00:13:34,314 : Time 01h 21m 00s, episode reward -21.0, episode length 824, reward mean -21.0000
+2020-04-08 00:13:49,945 : Time 01h 21m 16s, episode reward -20.0, episode length 962, reward mean -20.9688
+2020-04-08 00:14:04,487 : Time 01h 21m 30s, episode reward -21.0, episode length 764, reward mean -20.9697
+2020-04-08 00:14:19,483 : Time 01h 21m 45s, episode reward -21.0, episode length 824, reward mean -20.9706
+2020-04-08 00:14:34,003 : Time 01h 22m 00s, episode reward -21.0, episode length 764, reward mean -20.9714
+2020-04-08 00:24:45,963 : Time 01h 32m 12s, episode reward -21.0, episode length 3204, reward mean -20.9722
+2020-04-08 01:16:12,053 : Time 02h 23m 38s, episode reward -21.0, episode length 824, reward mean -20.9730
+2020-04-08 01:16:32,816 : Time 02h 23m 59s, episode reward -21.0, episode length 1964, reward mean -20.9737
+2020-04-08 01:16:47,389 : Time 02h 24m 13s, episode reward -21.0, episode length 825, reward mean -20.9744
+2020-04-08 01:17:01,827 : Time 02h 24m 28s, episode reward -21.0, episode length 824, reward mean -20.9750
+2020-04-08 01:17:29,406 : Time 02h 24m 55s, episode reward -21.0, episode length 3204, reward mean -20.9756
+2020-04-08 01:17:43,953 : Time 02h 25m 10s, episode reward -21.0, episode length 824, reward mean -20.9762
+2020-04-08 01:17:59,763 : Time 02h 25m 26s, episode reward -21.0, episode length 1964, reward mean -20.9767
+2020-04-08 01:18:17,640 : Time 02h 25m 44s, episode reward -21.0, episode length 1964, reward mean -20.9773
+2020-04-08 01:18:40,016 : Time 02h 26m 06s, episode reward -21.0, episode length 824, reward mean -20.9778
+2020-04-08 04:31:01,026 : Time 05h 38m 27s, episode reward -21.0, episode length 824, reward mean -20.9783
+2020-04-08 04:31:14,897 : Time 05h 38m 41s, episode reward -21.0, episode length 824, reward mean -20.9787
+2020-04-08 04:31:39,698 : Time 05h 39m 06s, episode reward -21.0, episode length 3204, reward mean -20.9792
+2020-04-08 04:31:57,810 : Time 05h 39m 24s, episode reward -20.0, episode length 1740, reward mean -20.9592
+2020-04-08 04:32:11,457 : Time 05h 39m 37s, episode reward -21.0, episode length 764, reward mean -20.9600
+2020-04-08 04:32:30,572 : Time 05h 39m 57s, episode reward -21.0, episode length 1964, reward mean -20.9608
+2020-04-08 04:32:49,738 : Time 05h 40m 16s, episode reward -21.0, episode length 1964, reward mean -20.9615
+2020-04-08 04:33:04,830 : Time 05h 40m 31s, episode reward -21.0, episode length 1964, reward mean -20.9623
+2020-04-08 04:33:20,648 : Time 05h 40m 47s, episode reward -21.0, episode length 1964, reward mean -20.9630
+2020-04-08 04:33:35,429 : Time 05h 41m 01s, episode reward -21.0, episode length 1644, reward mean -20.9636
+2020-04-08 04:33:52,748 : Time 05h 41m 19s, episode reward -21.0, episode length 1644, reward mean -20.9643
+2020-04-08 05:48:14,824 : Time 06h 55m 41s, episode reward 1.0, episode length 3894, reward mean -20.5789
+2020-04-08 05:48:30,629 : Time 06h 55m 57s, episode reward -21.0, episode length 1563, reward mean -20.5862
+2020-04-08 05:48:47,502 : Time 06h 56m 13s, episode reward -21.0, episode length 1964, reward mean -20.5932
+2020-04-08 05:49:05,377 : Time 06h 56m 31s, episode reward -20.0, episode length 2060, reward mean -20.5833
+2020-04-08 05:49:20,493 : Time 06h 56m 46s, episode reward -20.0, episode length 1459, reward mean -20.5738
+2020-04-08 05:49:37,865 : Time 06h 57m 04s, episode reward -21.0, episode length 1964, reward mean -20.5806
+2020-04-08 05:49:59,514 : Time 06h 57m 25s, episode reward 1.0, episode length 3894, reward mean -20.2381
+2020-04-08 05:50:25,261 : Time 06h 57m 51s, episode reward -11.0, episode length 4268, reward mean -20.0938
+2020-04-08 05:50:42,415 : Time 06h 58m 08s, episode reward -21.0, episode length 1964, reward mean -20.1077
+2020-04-08 05:50:57,394 : Time 06h 58m 23s, episode reward -21.0, episode length 1352, reward mean -20.1212
+2020-04-08 05:51:14,709 : Time 06h 58m 41s, episode reward -21.0, episode length 1924, reward mean -20.1343
+2020-04-08 05:51:31,557 : Time 06h 58m 58s, episode reward -21.0, episode length 2002, reward mean -20.1471
+2020-04-08 05:51:48,647 : Time 06h 59m 15s, episode reward -21.0, episode length 1924, reward mean -20.1594
+2020-04-08 05:52:05,412 : Time 06h 59m 31s, episode reward -21.0, episode length 1924, reward mean -20.1714
+2020-04-08 05:52:21,738 : Time 06h 59m 48s, episode reward -21.0, episode length 1886, reward mean -20.1831
