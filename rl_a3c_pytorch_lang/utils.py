@@ -84,6 +84,8 @@ def read_pong_instructions(path):
             label = int(parts[0])
             sentence = parts[1]
             sentence += " <eos>"
+            while len(sentence.split()) < 10:
+                sentence += " <pad>"
 
             if label == 2:
                 instruction_sets[2].append(sentence)

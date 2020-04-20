@@ -13,12 +13,17 @@ from test import test
 from shared_optim import SharedRMSprop, SharedAdam
 #from gym.configuration import undo_logger_setup
 import time
-import gensim
+from embedding import Embedding
 import numpy as np
 
 # Define arguments
 #undo_logger_setup()
 parser = argparse.ArgumentParser(description='A3C')
+parser.add_argument(
+    '--render',
+    default=False,
+    metavar='R',
+    help='Watch game as it being played')
 parser.add_argument(
     '--lr',
     type=float,
@@ -108,6 +113,7 @@ parser.add_argument(
     default=0,
     nargs='+',
     help='GPUs to use [-1 CPU only] (default: -1)')
+
 parser.add_argument(
     '--amsgrad',
     default=True,
@@ -119,6 +125,10 @@ parser.add_argument(
     default=4,
     metavar='SR',
     help='frame skip rate (default: 4)')
+parser.add_argument(
+    '--use-full-emb',
+    action='store_true'
+)
 
 # Based on
 # https://github.com/pytorch/examples/tree/master/mnist_hogwild
@@ -146,12 +156,26 @@ if __name__ == '__main__':
     env = atari_env(args.env, env_conf, args)
 
     # Read embedding model
-    emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
+    if args.use_full_emb:
+        import gensim
+        emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
 
-    # Append '<eos>' to the embedding model
-    direction = np.zeros(100)
-    direction[0] = 1
-    emb.add("<eos>", direction)
+        # Append special words to the embedding model
+        direction = np.zeros(100)
+
+        direction[0] = 1
+        emb.add("<eos>", direction) # ignore the warning here
+        direction[1] = 1
+        emb.add("<pad>", direction)
+        direction[2] = 1
+        emb.add("<oov>", direction)
+
+    else:
+        emb = Embedding(args.emb_path)
+        emb.add_word("<eos>")
+        emb.add_word("<pad>")
+        emb.add_word("<oov>", np.ones(emb.emb_dim))
+
 
     # Reading instruction file
     instructions = read_pong_instructions("./data/pong.txt")

@@ -67,11 +67,11 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
         if player.done:
             if gpu_id >= 0:
                 with torch.cuda.device(gpu_id):
-                    player.cx = Variable(torch.zeros(1, 100).cuda())
-                    player.hx = Variable(torch.zeros(1, 100).cuda())
+                    player.cx = Variable(torch.zeros(1, 25).cuda())
+                    player.hx = Variable(torch.zeros(1, 25).cuda())
             else:
-                player.cx = Variable(torch.zeros(1, 100))
-                player.hx = Variable(torch.zeros(1, 100))
+                player.cx = Variable(torch.zeros(1, 25))
+                player.hx = Variable(torch.zeros(1, 25))
 
         # If not ended, save current state value
         else:
@@ -119,37 +119,43 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
 
         # Accumulate the losses
         for i in reversed(range(len(player.rewards))):
-            # Calculate language loss
-            # TODO: Calculate sentence loss here
-            #       Action can be retrieved from log_probs
-            #       Write util to pair action with sentence
 
+            # Calculating language loss
             # Get action of a time step
             a = np.argmax(player.log_probs[i].detach().cpu().numpy())
 
             # Get produced vectors of the time step
             produced_vectors = player.produced_vectors[i]
-
-            # Get target vectors of the time step (a random instruction corresponding to the action)
+            # print(produced_vectors)
+            # Get target vectors of the time step (an instruction corresponding to the least cost)
             action_instructions = instructions[a]
-            instruction = action_instructions[int(np.random.rand() * len(action_instructions))]
-            # print(a, instruction)
-            ins_words = instruction.split()
-            target_vectors = []
-            for w in ins_words:
-                if w in emb.vocab:
-                    target_vectors.append(emb.get_vector(w))
-                else:
-                    target_vectors.append(np.zeros(100))
+            losses = []
+            for instruction in action_instructions:
 
-            # Add language cost to the accumulator
-            for pos, target_vector in enumerate(target_vectors):
-                curr_vector = produced_vectors[pos]
-                if np.array_equal(target_vector, eos_vector):
-                    break
-                if np.array_equal(curr_vector, eos_vector):
-                    break
-                language_loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
+                # print(a, instruction)
+                ins_words = instruction.split()
+                # Building target vector
+                target_vectors = []
+                for w in ins_words:
+                    if w in emb.vocab:
+                        target_vectors.append(emb.get_vector(w))
+                    else:
+                        target_vectors.append(emb.get_vector('<oov>'))
+
+                # Add language cost to the accumulator
+                loss = 0
+                for pos, target_vector in enumerate(target_vectors):
+                    curr_vector = produced_vectors[pos]
+                    """
+                    if np.array_equal(target_vector, eos_vector):
+                        break
+                    if np.array_equal(curr_vector, eos_vector):
+                        break
+                    """
+                    loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
+                losses.append(loss)
+
+            language_loss = np.min(losses)
 
             # Calculate other losses
             R = args.gamma * R + player.rewards[i]
@@ -176,13 +182,13 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
 
         # Calculate grad and update
         (policy_loss + 0.5 * value_loss + 0.1 * language_loss).backward()
-        """
+        #"""
         print("****************")
         print(policy_loss)
         print(value_loss)
         print(language_loss)
         print("****************")
-        """
+        #"""
         ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
         optimizer.step()
 

@@ -1,2 +1,20 @@
+Now
+
+1. Use pad so that there is no need to calculate 'closest' during training
+
+
+Experiment
+
 1. Language cannot be the only source of state repr. Try concatenating it with the original state repr.
-2. Pre-train the language model and / or the A3C model alone.
+2. Pre-train the language model and / or the A3C model alone
+3. Lower the dimension of input for smaller games
+4. Freeze & transfer language part
+5. Try on run it on montezuma's revenge
+6. Finish Manual control
+
+
+Report
+
+1. Background for multi-modal learning
+
+

@@ -7,7 +7,7 @@ from utils import norm_col_init, weights_init, find_closest
 
 class A3Clstm(torch.nn.Module):
     def __init__(self, num_inputs, action_space, emb):
-
+        self.alpha = 0.5
         self.emb = emb
 
         super(A3Clstm, self).__init__()
@@ -22,22 +22,23 @@ class A3Clstm(torch.nn.Module):
 
         # 1024 = 64 * 64 / 4
 
-        self.flatten = nn.Linear(1024, 100)
+        self.flatten = nn.Linear(1024, 25)
 
-        self.lstm = nn.LSTMCell(100, 100)
+        self.lstm = nn.LSTMCell(25, 25)
         num_outputs = action_space.n
 
         # Critic (State -> Value)
-        self.critic_linear = nn.Linear(100, 1)
+        self.critic_linear = nn.Linear(25, 1)
 
         # Actor (State -> Action Probabilities)
-        self.actor_linear = nn.Linear(100, num_outputs)
+        self.actor_linear = nn.Linear(25, num_outputs)
+        self.actor_lang_linear = nn.Linear(25, num_outputs)
 
         # LSTM for encoding state into language for actor
-        self.lstm_enc = nn.LSTMCell(100, 100)
+        self.lstm_enc = nn.LSTMCell(25, 25)
 
         # LSTM for decoding state
-        self.lstm_dec = nn.LSTMCell(100, 100)
+        self.lstm_dec = nn.LSTMCell(25, 25)
 
         self.apply(weights_init)
         relu_gain = nn.init.calculate_gain('relu')
@@ -77,39 +78,26 @@ class A3Clstm(torch.nn.Module):
 
         x = hx
         critic_out = self.critic_linear(x)
+        actor_fc = self.actor_linear(x)
 
         # Encoder
         state_repr_input = x
         hx_enc = torch.zeros_like(state_repr_input)
         cx_enc = torch.zeros_like(state_repr_input)
         encoder_output_vectors = []
-        encoder_output_vectors_matched = []
-        matched_words = []
         inp = state_repr_input
         for _ in range(10): # TODO: 10 is a hyper parameter (seq len)
             hx_enc, cx_enc = self.lstm_enc(inp, (hx_enc, cx_enc))
             inp = hx_enc
-            encoder_output_vectors_matched.append(inp)
             encoder_output_vectors.append(hx_enc)
-
-            hx_enc_vec = hx_enc.detach().cpu().numpy().squeeze()
-            matched_word = find_closest(self.emb, hx_enc_vec, return_word=True)
-
-
-            matched_words.append(matched_word)
-            if matched_word == "<eos>":
-                print("sentence ended properly in encoder")
-                break
 
         # Decoder
         hx_dec = torch.zeros_like(hx_enc)
         cx_dec = torch.zeros_like(hx_enc)
         for i in range(10):
-            hx_dec, cx_dec = self.lstm_dec(encoder_output_vectors_matched[i], (hx_dec, cx_dec))
-            if matched_words[i] == "<eos>":
-                print("sent ended in decoder")
-                break
+            hx_dec, cx_dec = self.lstm_dec(encoder_output_vectors[i], (hx_dec, cx_dec))
 
-        actor_out = self.actor_linear(hx_dec)
+        actor_lang = self.actor_lang_linear(hx_dec)
+        actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
 
         return encoder_output_vectors, critic_out, actor_out, (hx, cx)
