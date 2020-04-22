@@ -1,37 +1,22 @@
-2020-04-20 22:30:48,711 : render: False
-2020-04-20 22:30:48,711 : lr: 0.0001
-2020-04-20 22:30:48,711 : gamma: 0.99
-2020-04-20 22:30:48,711 : tau: 1.0
-2020-04-20 22:30:48,712 : seed: 1
-2020-04-20 22:30:48,712 : workers: 1
-2020-04-20 22:30:48,712 : num_steps: 20
-2020-04-20 22:30:48,712 : max_episode_length: 10000
-2020-04-20 22:30:48,712 : env: PongDeterministic-v4
-2020-04-20 22:30:48,712 : env_config: config.json
-2020-04-20 22:30:48,712 : shared_optimizer: True
-2020-04-20 22:30:48,712 : load: False
-2020-04-20 22:30:48,712 : save_max: True
-2020-04-20 22:30:48,712 : optimizer: Adam
-2020-04-20 22:30:48,712 : load_model_dir: trained_models/
-2020-04-20 22:30:48,712 : save_model_dir: trained_models/
-2020-04-20 22:30:48,712 : log_dir: logs/
-2020-04-20 22:30:48,712 : emb_path: ../emb/glove_twitter_25d_changed.txt
-2020-04-20 22:30:48,713 : gpu_ids: [0]
-2020-04-20 22:30:48,713 : amsgrad: True
-2020-04-20 22:30:48,713 : skip_rate: 4
-2020-04-20 22:30:48,713 : use_full_emb: False
-2020-04-20 22:30:52,248 : Time 00h 00m 03s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:31:04,244 : Time 00h 00m 15s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:31:16,230 : Time 00h 00m 27s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:31:28,208 : Time 00h 00m 39s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:31:40,207 : Time 00h 00m 51s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:31:52,162 : Time 00h 01m 03s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:32:04,128 : Time 00h 01m 15s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:32:16,234 : Time 00h 01m 27s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:32:28,180 : Time 00h 01m 39s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:32:40,118 : Time 00h 01m 51s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:32:52,094 : Time 00h 02m 03s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:33:04,127 : Time 00h 02m 15s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:33:16,120 : Time 00h 02m 27s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:33:28,108 : Time 00h 02m 39s, episode reward -21.0, episode length 764, reward mean -21.0000
-2020-04-20 22:33:40,150 : Time 00h 02m 51s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-21 14:06:49,135 : render: True
+2020-04-21 14:06:49,135 : lr: 0.0001
+2020-04-21 14:06:49,135 : gamma: 0.99
+2020-04-21 14:06:49,135 : tau: 1.0
+2020-04-21 14:06:49,135 : seed: 1
+2020-04-21 14:06:49,135 : workers: 1
+2020-04-21 14:06:49,135 : num_steps: 20
+2020-04-21 14:06:49,135 : max_episode_length: 10000
+2020-04-21 14:06:49,135 : env: PongDeterministic-v4
+2020-04-21 14:06:49,135 : env_config: config.json
+2020-04-21 14:06:49,135 : shared_optimizer: True
+2020-04-21 14:06:49,135 : load: False
+2020-04-21 14:06:49,135 : save_max: True
+2020-04-21 14:06:49,135 : optimizer: Adam
+2020-04-21 14:06:49,136 : load_model_dir: trained_models/
+2020-04-21 14:06:49,136 : save_model_dir: trained_models/
+2020-04-21 14:06:49,136 : log_dir: logs/
+2020-04-21 14:06:49,136 : emb_path: ../emb/glove_twitter_25d_changed.txt
+2020-04-21 14:06:49,136 : gpu_ids: [0]
+2020-04-21 14:06:49,136 : amsgrad: True
+2020-04-21 14:06:49,136 : skip_rate: 4
+2020-04-21 14:06:49,136 : use_full_emb: False

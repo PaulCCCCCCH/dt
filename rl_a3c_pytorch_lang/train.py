@@ -34,7 +34,7 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
     env.seed(args.seed + rank)
 
     # Create agent
-    player = Agent(None, env, args, None, None)
+    player = Agent(None, env, args, None, emb)
     player.gpu_id = gpu_id
 
     # Create DNN model for the agent

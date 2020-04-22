@@ -30,7 +30,7 @@ def test(args, shared_model, env_conf, emb):
     start_time = time.time()
     num_tests = 0
     reward_total_sum = 0
-    player = Agent(None, env, args, None, None)
+    player = Agent(None, env, args, None, emb)
     player.gpu_id = gpu_id
     player.model = A3Clstm(player.env.observation_space.shape[0],
                            player.env.action_space, emb)

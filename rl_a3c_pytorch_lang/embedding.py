@@ -11,7 +11,7 @@ def is_alpha(word):
 class Embedding:
     def __init__(self, emb_path):
         self.emb_dim = 25
-        self.emb_to_load = 5000
+        self.emb_to_load = 10000
         self.vocab = []
         self._word_indices = dict()
         self.emb_mat = None
@@ -37,8 +37,9 @@ class Embedding:
 
         self.emb_mat = emb
 
-    def index2entity(self, index):
-        return self.vocab[index]
+    @property
+    def index2entity(self):
+        return self.vocab
 
     def get_vector(self, word):
         return self.emb_mat[self._word_indices[word]]
@@ -51,12 +52,15 @@ class Embedding:
             init = np.zeros(self.emb_dim)
         self.emb_mat = np.vstack((self.emb_mat, init))
 
-    def distances(self, word):
-        word_vec = self.get_vector(word)
+    def distances(self, word_or_vec):
+        if type(word_or_vec) == str:
+            word_vec = self.get_vector(word_or_vec)
+        else:
+            word_vec = word_or_vec
         dists = []
         for w in self.vocab:
             target_vec = self.get_vector(w)
-            dist = np.sum(np.square(target_vec - word_vec))
+            dist = np.sum(np.square(target_vec - word_vec.numpy()))
             dists.append(dist)
         return dists
 

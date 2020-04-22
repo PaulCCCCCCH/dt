@@ -11,8 +11,8 @@ import gym
 import logging
 import time
 #from gym.configuration import undo_logger_setup
-import gensim
 import numpy as np
+from embedding import Embedding
 
 #undo_logger_setup()
 parser = argparse.ArgumentParser(description='A3C_EVAL')
@@ -80,6 +80,9 @@ parser.add_argument(
     default=False,
     metavar='NGE',
     help='Create a gym evaluation for upload')
+parser.add_argument(
+    '--use-full-emb',
+    action='store_true')
 args = parser.parse_args()
 
 setup_json = read_config(args.env_config)
@@ -108,14 +111,27 @@ d_args = vars(args)
 for k in d_args.keys():
     log['{}_mon_log'.format(args.env)].info('{0}: {1}'.format(k, d_args[k]))
 
-
 # Read embedding model
-emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
+if args.use_full_emb:
+    import gensim
 
-# Append '<eos>' to the embedding model
-direction = np.zeros(100)
-direction[0] = 1
-emb.add("<eos>", direction)
+    emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
+
+    # Append special words to the embedding model
+    direction = np.zeros(100)
+
+    direction[0] = 1
+    emb.add("<eos>", direction)  # ignore the warning here
+    direction[1] = 1
+    emb.add("<pad>", direction)
+    direction[2] = 1
+    emb.add("<oov>", direction)
+
+else:
+    emb = Embedding(args.emb_path)
+    emb.add_word("<eos>")
+    emb.add_word("<pad>")
+    emb.add_word("<oov>", np.ones(emb.emb_dim))
 
 env = atari_env("{}".format(args.env), env_conf, args)
 num_tests = 0
