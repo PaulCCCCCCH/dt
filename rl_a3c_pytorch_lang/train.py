@@ -185,14 +185,15 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
             (policy_loss + 0.5 * value_loss).backward()
 
         # (policy_loss + 0.5 * value_loss).backward()
-        #"""
+        """
         print("****************")
         print(policy_loss)
         print(value_loss)
+        print("****************")
+        """
         if args.use_language:
             print(language_loss)
-        print("****************")
-        #"""
+        # """
         ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
         optimizer.step()
 

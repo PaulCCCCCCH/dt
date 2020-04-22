@@ -1,30 +1,72 @@
-2020-04-22 22:14:49,885 : env: PongDeterministic-v4
-2020-04-22 22:14:49,885 : env_config: config.json
-2020-04-22 22:14:49,885 : num_episodes: 100
-2020-04-22 22:14:49,885 : log_dir: logs/
-2020-04-22 22:14:49,885 : render_freq: 1
-2020-04-22 22:14:49,885 : max_episode_length: 10000
-2020-04-22 22:14:49,885 : gpu_id: -1
-2020-04-22 22:14:49,886 : new_gym_eval: False
-2020-04-22 22:14:49,886 : render: False
-2020-04-22 22:14:49,886 : lr: 0.0001
-2020-04-22 22:14:49,886 : gamma: 0.99
-2020-04-22 22:14:49,886 : tau: 1.0
-2020-04-22 22:14:49,886 : seed: 1
-2020-04-22 22:14:49,886 : workers: 1
-2020-04-22 22:14:49,886 : num_steps: 20
-2020-04-22 22:14:49,886 : shared_optimizer: True
-2020-04-22 22:14:49,886 : load: False
-2020-04-22 22:14:49,886 : save_max: True
-2020-04-22 22:14:49,886 : optimizer: Adam
-2020-04-22 22:14:49,886 : load_model_dir: trained_models/
-2020-04-22 22:14:49,886 : save_model_dir: trained_models/
-2020-04-22 22:14:49,886 : emb_path: ../emb/glove_twitter_25d_changed.txt
-2020-04-22 22:14:49,886 : gpu_ids: [0]
-2020-04-22 22:14:49,886 : amsgrad: True
-2020-04-22 22:14:49,886 : skip_rate: 4
-2020-04-22 22:14:49,886 : use_full_emb: False
-2020-04-22 22:14:49,887 : use_language: False
-2020-04-22 22:14:49,887 : emb_dim: 25
-2020-04-22 22:14:49,887 : lstm_size: 100
-2020-04-22 22:14:52,869 : Time 00h 00m 02s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:22:13,888 : env: PongDeterministic-v4
+2020-04-22 22:22:13,888 : env_config: config.json
+2020-04-22 22:22:13,888 : num_episodes: 100
+2020-04-22 22:22:13,889 : log_dir: logs/
+2020-04-22 22:22:13,889 : render_freq: 1
+2020-04-22 22:22:13,889 : max_episode_length: 10000
+2020-04-22 22:22:13,889 : gpu_id: -1
+2020-04-22 22:22:13,889 : new_gym_eval: False
+2020-04-22 22:22:13,889 : render: False
+2020-04-22 22:22:13,889 : lr: 0.0001
+2020-04-22 22:22:13,889 : gamma: 0.99
+2020-04-22 22:22:13,889 : tau: 1.0
+2020-04-22 22:22:13,889 : seed: 1
+2020-04-22 22:22:13,889 : workers: 9
+2020-04-22 22:22:13,889 : num_steps: 20
+2020-04-22 22:22:13,889 : shared_optimizer: True
+2020-04-22 22:22:13,889 : load: False
+2020-04-22 22:22:13,890 : save_max: True
+2020-04-22 22:22:13,890 : optimizer: Adam
+2020-04-22 22:22:13,890 : load_model_dir: trained_models/
+2020-04-22 22:22:13,890 : save_model_dir: trained_models/
+2020-04-22 22:22:13,890 : emb_path: ../emb/glove_twitter_25d_changed.txt
+2020-04-22 22:22:13,890 : gpu_ids: [0]
+2020-04-22 22:22:13,890 : amsgrad: True
+2020-04-22 22:22:13,890 : skip_rate: 4
+2020-04-22 22:22:13,890 : use_full_emb: False
+2020-04-22 22:22:13,890 : use_language: False
+2020-04-22 22:22:13,890 : emb_dim: 25
+2020-04-22 22:22:13,890 : lstm_size: 100
+2020-04-22 22:22:17,328 : Time 00h 00m 03s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:22:30,569 : Time 00h 00m 16s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:22:43,882 : Time 00h 00m 29s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:22:57,269 : Time 00h 00m 43s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:23:10,445 : Time 00h 00m 56s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:23:23,844 : Time 00h 01m 09s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:23:37,178 : Time 00h 01m 23s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:23:50,535 : Time 00h 01m 36s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:24:03,911 : Time 00h 01m 49s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:24:17,124 : Time 00h 02m 03s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:24:34,122 : Time 00h 02m 20s, episode reward -21.0, episode length 1624, reward mean -21.0000
+2020-04-22 22:24:47,593 : Time 00h 02m 33s, episode reward -21.0, episode length 783, reward mean -21.0000
+2020-04-22 22:25:01,145 : Time 00h 02m 47s, episode reward -21.0, episode length 783, reward mean -21.0000
+2020-04-22 22:25:14,441 : Time 00h 03m 00s, episode reward -21.0, episode length 764, reward mean -21.0000
+2020-04-22 22:25:28,014 : Time 00h 03m 13s, episode reward -21.0, episode length 826, reward mean -21.0000
+2020-04-22 22:25:41,593 : Time 00h 03m 27s, episode reward -21.0, episode length 826, reward mean -21.0000
+2020-04-22 22:26:00,050 : Time 00h 03m 46s, episode reward -21.0, episode length 1954, reward mean -21.0000
+2020-04-22 22:26:18,701 : Time 00h 04m 04s, episode reward -21.0, episode length 1984, reward mean -21.0000
+2020-04-22 22:26:32,448 : Time 00h 04m 18s, episode reward -21.0, episode length 856, reward mean -21.0000
+2020-04-22 22:26:48,087 : Time 00h 04m 34s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:27:03,878 : Time 00h 04m 49s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:27:22,307 : Time 00h 05m 08s, episode reward -21.0, episode length 1944, reward mean -21.0000
+2020-04-22 22:27:39,109 : Time 00h 05m 25s, episode reward -21.0, episode length 1554, reward mean -21.0000
+2020-04-22 22:27:54,917 : Time 00h 05m 40s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:28:10,504 : Time 00h 05m 56s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:28:26,553 : Time 00h 06m 12s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:28:44,944 : Time 00h 06m 30s, episode reward -21.0, episode length 1944, reward mean -21.0000
+2020-04-22 22:29:03,196 : Time 00h 06m 49s, episode reward -21.0, episode length 1984, reward mean -21.0000
+2020-04-22 22:29:19,021 : Time 00h 07m 05s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:29:34,804 : Time 00h 07m 20s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:29:50,494 : Time 00h 07m 36s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:30:07,521 : Time 00h 07m 53s, episode reward -21.0, episode length 1624, reward mean -21.0000
+2020-04-22 22:30:23,174 : Time 00h 08m 09s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:30:40,095 : Time 00h 08m 26s, episode reward -21.0, episode length 1624, reward mean -21.0000
+2020-04-22 22:30:55,772 : Time 00h 08m 41s, episode reward -21.0, episode length 1324, reward mean -21.0000
+2020-04-22 22:31:15,020 : Time 00h 09m 01s, episode reward -20.0, episode length 2139, reward mean -20.9722
+2020-04-22 22:31:38,815 : Time 00h 09m 24s, episode reward -21.0, episode length 3191, reward mean -20.9730
+2020-04-22 22:32:02,743 : Time 00h 09m 48s, episode reward -21.0, episode length 3204, reward mean -20.9737
+2020-04-22 22:32:26,434 : Time 00h 10m 12s, episode reward -21.0, episode length 3204, reward mean -20.9744
+2020-04-22 22:32:50,445 : Time 00h 10m 36s, episode reward -21.0, episode length 3204, reward mean -20.9750
+2020-04-22 22:33:14,296 : Time 00h 11m 00s, episode reward -21.0, episode length 3204, reward mean -20.9756
+2020-04-22 22:33:40,475 : Time 00h 11m 26s, episode reward -21.0, episode length 3764, reward mean -20.9762
+2020-04-22 22:34:10,013 : Time 00h 11m 55s, episode reward -21.0, episode length 4544, reward mean -20.9767
