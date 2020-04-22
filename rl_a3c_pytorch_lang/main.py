@@ -155,6 +155,9 @@ if __name__ == '__main__':
             env_conf = setup_json[i]
     env = atari_env(args.env, env_conf, args)
 
+    # Reading instruction file
+    instructions, specific_vocab = read_pong_instructions("./data/pong.txt")
+
     # Read embedding model
     if args.use_full_emb:
         import gensim
@@ -171,14 +174,10 @@ if __name__ == '__main__':
         emb.add("<oov>", direction)
 
     else:
-        emb = Embedding(args.emb_path)
+        emb = Embedding(args.emb_path, specific_vocab)
         emb.add_word("<eos>")
         emb.add_word("<pad>")
         emb.add_word("<oov>", np.ones(emb.emb_dim))
-
-
-    # Reading instruction file
-    instructions = read_pong_instructions("./data/pong.txt")
 
     # Creates a shared model and load from checkpoint
     shared_model = A3Clstm(env.observation_space.shape[0], env.action_space, emb)

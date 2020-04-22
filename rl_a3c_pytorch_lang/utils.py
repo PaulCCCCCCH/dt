@@ -75,6 +75,7 @@ def find_closest(emb, word, return_vector=False, return_word=False):
 
 def read_pong_instructions(path):
     instruction_sets = {0: [], 1: [], 2: [], 3: [], 4: [], 5: []}
+    vocab_set = set()
     with open(path, "r") as f:
 
         lines = f.readlines()
@@ -87,6 +88,9 @@ def read_pong_instructions(path):
             while len(sentence.split()) < 10:
                 sentence += " <pad>"
 
+            for w in sentence.split():
+                vocab_set.add(w)
+
             if label == 2:
                 instruction_sets[2].append(sentence)
                 instruction_sets[4].append(sentence)
@@ -97,6 +101,6 @@ def read_pong_instructions(path):
                 instruction_sets[0].append(sentence)
                 instruction_sets[1].append(sentence)
 
-    return instruction_sets
+    return instruction_sets, vocab_set
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-
+from utils import read_pong_instructions
 
 def is_alpha(word):
     try:
@@ -9,33 +9,39 @@ def is_alpha(word):
 
 
 class Embedding:
-    def __init__(self, emb_path):
+    def __init__(self, emb_path, specific_vocab=None):
         self.emb_dim = 25
-        self.emb_to_load = 10000
+        self.emb_to_load = 1000
         self.vocab = []
-        self._word_indices = dict()
         self.emb_mat = None
+        self._specific_vocab = specific_vocab
+        self._word_indices = dict()
         self._load_embedding(emb_path)
 
     def _load_embedding(self, emb_path):
         count = 0
-        emb = np.empty((self.emb_to_load, self.emb_dim), dtype=np.float32)
+        emb = []
 
         with open(emb_path, 'r') as f:
             for line in f:
-                if count >= self.emb_to_load:
-                    break
                 s = line.split()
+                if count >= self.emb_to_load and self._specific_vocab is None:
+                    break
+
+                if count >= self.emb_to_load:
+                    if s[0] not in self._specific_vocab:
+                        continue
+
                 if is_alpha(s[0]):
                     self.vocab.append(s[0])
                     self._word_indices[s[0]] = count
-                    emb[count, :] = np.asarray(s[1:])
+                    emb.append(np.asarray(s[1:], dtype=np.float32))
                     count += 1
 
         for index, word in enumerate(self.vocab):
             self._word_indices[word] = index
 
-        self.emb_mat = emb
+        self.emb_mat = np.array(emb)
 
     @property
     def index2entity(self):
@@ -60,7 +66,7 @@ class Embedding:
         dists = []
         for w in self.vocab:
             target_vec = self.get_vector(w)
-            dist = np.sum(np.square(target_vec - word_vec.numpy()))
+            dist = np.sum(np.square(target_vec - word_vec))
             dists.append(dist)
         return dists
 
@@ -68,7 +74,8 @@ class Embedding:
 if __name__ == '__main__':
     # Test
     path = '../emb/glove_twitter_25d_changed.txt'
-    emb = Embedding(emb_path=path)
+    instructions, specific_vocab = read_pong_instructions("./data/pong.txt")
+    emb = Embedding(emb_path=path, specific_vocab=specific_vocab)
     emb.add_word("<eos>")
     emb.add_word("<pad>")
     emb.add_word("<oov>")
