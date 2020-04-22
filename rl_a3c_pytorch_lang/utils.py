@@ -33,6 +33,13 @@ def norm_col_init(weights, std=1.0):
 def ensure_shared_grads(model, shared_model, gpu=False):
     for param, shared_param in zip(model.parameters(),
                                    shared_model.parameters()):
+        """
+        print("***************")
+        print(shared_param)
+        print(shared_param.grad)
+        print(shared_param._grad)
+        print("***************")
+        """
         if shared_param.grad is not None and not gpu:
             return
         elif not gpu:

@@ -1,7 +1,9 @@
 Now
 
-1. Use pad so that there is no need to calculate 'closest' during training
-
+Done. Use pad so that there is no need to calculate 'closest' during training
+1. Allow continuing from checkpoint
+2. Allow training separately
+3. Loss function update
 
 Experiment
 

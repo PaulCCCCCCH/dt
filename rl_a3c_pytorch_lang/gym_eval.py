@@ -1,7 +1,6 @@
 from __future__ import division
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
-import argparse
 import torch
 from environment import atari_env
 from utils import read_config, setup_logger
@@ -13,77 +12,10 @@ import time
 #from gym.configuration import undo_logger_setup
 import numpy as np
 from embedding import Embedding
+from params import args
 
 #undo_logger_setup()
-parser = argparse.ArgumentParser(description='A3C_EVAL')
-parser.add_argument(
-    '--env',
-    default='Pong-v0',
-    metavar='ENV',
-    help='environment to train on (default: Pong-v0)')
-parser.add_argument(
-    '--env-config',
-    default='config.json',
-    metavar='EC',
-    help='environment to crop and resize info (default: config.json)')
-parser.add_argument(
-    '--num-episodes',
-    type=int,
-    default=100,
-    metavar='NE',
-    help='how many episodes in evaluation (default: 100)')
-parser.add_argument(
-    '--load-model-dir',
-    default='trained_models/',
-    metavar='LMD',
-    help='folder to load trained models from')
-parser.add_argument(
-    '--log-dir', default='logs/', metavar='LG', help='folder to save logs')
-parser.add_argument(
-    '--emb-path', default='../emb/model.bin', metavar='EP', help='embedding file to load')
-parser.add_argument(
-    '--render',
-    default=False,
-    metavar='R',
-    help='Watch game as it being played')
-parser.add_argument(
-    '--render-freq',
-    type=int,
-    default=1,
-    metavar='RF',
-    help='Frequency to watch rendered game play')
-parser.add_argument(
-    '--max-episode-length',
-    type=int,
-    default=10000,
-    metavar='M',
-    help='maximum length of an episode (default: 100000)')
-parser.add_argument(
-    '--gpu-id',
-    type=int,
-    default=-1,
-    help='GPU to use [-1 CPU only] (default: -1)')
-parser.add_argument(
-    '--skip-rate',
-    type=int,
-    default=4,
-    metavar='SR',
-    help='frame skip rate (default: 4)')
-parser.add_argument(
-    '--seed',
-    type=int,
-    default=1,
-    metavar='S',
-    help='random seed (default: 1)')
-parser.add_argument(
-    '--new-gym-eval',
-    default=False,
-    metavar='NGE',
-    help='Create a gym evaluation for upload')
-parser.add_argument(
-    '--use-full-emb',
-    action='store_true')
-args = parser.parse_args()
+
 
 setup_json = read_config(args.env_config)
 env_conf = setup_json["Default"]

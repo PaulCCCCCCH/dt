@@ -67,11 +67,11 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
         if player.done:
             if gpu_id >= 0:
                 with torch.cuda.device(gpu_id):
-                    player.cx = Variable(torch.zeros(1, 25).cuda())
-                    player.hx = Variable(torch.zeros(1, 25).cuda())
+                    player.cx = Variable(torch.zeros(1, args.lstm_size).cuda())
+                    player.hx = Variable(torch.zeros(1, args.lstm_size).cuda())
             else:
-                player.cx = Variable(torch.zeros(1, 25))
-                player.hx = Variable(torch.zeros(1, 25))
+                player.cx = Variable(torch.zeros(1, args.lstm_size))
+                player.hx = Variable(torch.zeros(1, args.lstm_size))
 
         # If not ended, save current state value
         else:
@@ -120,47 +120,47 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
         # Accumulate the losses
         for i in reversed(range(len(player.rewards))):
 
-            # Calculating language loss
-            # Get action of a time step
-            a = np.argmax(player.log_probs[i].detach().cpu().numpy())
+            if args.use_language:
+                # Calculating language loss
+                # Get action of a time step
+                a = np.argmax(player.log_probs[i].detach().cpu().numpy())
 
-            # Get produced vectors of the time step
-            produced_vectors = player.produced_vectors[i]
-            # print(produced_vectors)
-            # Get target vectors of the time step (an instruction corresponding to the least cost)
-            action_instructions = instructions[a]
-            losses = []
-            for instruction in action_instructions:
+                # Get produced vectors of the time step
+                produced_vectors = player.produced_vectors[i]
+                # print(produced_vectors)
+                # Get target vectors of the time step (an instruction corresponding to the least cost)
+                action_instructions = instructions[a]
+                losses = []
+                for instruction in action_instructions:
 
-                # print(a, instruction)
-                ins_words = instruction.split()
-                # Building target vector
-                target_vectors = []
-                for w in ins_words:
-                    if w in emb.vocab:
-                        target_vectors.append(emb.get_vector(w))
-                    else:
-                        target_vectors.append(emb.get_vector('<oov>'))
+                    # print(a, instruction)
+                    ins_words = instruction.split()
+                    # Building target vector
+                    target_vectors = []
+                    for w in ins_words:
+                        if w in emb.vocab:
+                            target_vectors.append(emb.get_vector(w))
+                        else:
+                            target_vectors.append(emb.get_vector('<oov>'))
 
-                # Add language cost to the accumulator
-                loss = 0
-                for pos, target_vector in enumerate(target_vectors):
-                    curr_vector = produced_vectors[pos]
-                    """
-                    if np.array_equal(target_vector, eos_vector):
-                        break
-                    if np.array_equal(curr_vector, eos_vector):
-                        break
-                    """
-                    loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
-                losses.append(loss)
+                    # Add language cost to the accumulator
+                    loss = 0
+                    for pos, target_vector in enumerate(target_vectors):
+                        curr_vector = produced_vectors[pos]
+                        """
+                        if np.array_equal(target_vector, eos_vector):
+                            break
+                        if np.array_equal(curr_vector, eos_vector):
+                            break
+                        """
+                        loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
+                    losses.append(loss)
 
-            language_loss = np.min(losses)
+                language_loss = np.min(losses)
 
             # Calculate other losses
             R = args.gamma * R + player.rewards[i]
             advantage = R - player.values[i]
-
 
             value_loss = value_loss + 0.5 * advantage.pow(2)
 
@@ -175,18 +175,22 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
                 Variable(gae) - 0.01 * player.entropies[i]
 
 
-
-
         # Initialise grad accumulator
         player.model.zero_grad()
 
         # Calculate grad and update
-        (policy_loss + 0.5 * value_loss + 0.1 * language_loss).backward()
+        if args.use_language:
+            (policy_loss + 0.5 * value_loss + 0.1 * language_loss).backward()
+        else:
+            (policy_loss + 0.5 * value_loss).backward()
+
+        # (policy_loss + 0.5 * value_loss).backward()
         #"""
         print("****************")
         print(policy_loss)
         print(value_loss)
-        print(language_loss)
+        if args.use_language:
+            print(language_loss)
         print("****************")
         #"""
         ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
