@@ -3,7 +3,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 import torch
 from environment import atari_env
-from utils import read_config, setup_logger
+from utils import read_config, setup_logger, read_pong_instructions
 from model_lang import A3Clstm
 from player_util_lang import Agent
 import gym
@@ -43,27 +43,29 @@ d_args = vars(args)
 for k in d_args.keys():
     log['{}_mon_log'.format(args.env)].info('{0}: {1}'.format(k, d_args[k]))
 
+
+_, specific_vocab = read_pong_instructions("./data/pong.txt")
+
 # Read embedding model
 if args.use_full_emb:
     import gensim
 
     emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
 
-    # Append special words to the embedding model
-    direction = np.zeros(100)
-
-    direction[0] = 1
-    emb.add("<eos>", direction)  # ignore the warning here
-    direction[1] = 1
-    emb.add("<pad>", direction)
-    direction[2] = 1
-    emb.add("<oov>", direction)
 
 else:
-    emb = Embedding(args.emb_path)
-    emb.add_word("<eos>")
-    emb.add_word("<pad>")
-    emb.add_word("<oov>", np.ones(emb.emb_dim))
+    emb = Embedding(args.emb_path, specific_vocab)
+
+# Append special words to the embedding model
+direction = np.zeros(args.emb_dim)
+direction[0] = 1
+emb.add("<eos>", direction)  # ignore the warning here
+direction[0] = 0
+direction[1] = 1
+emb.add("<pad>", direction)
+direction[1] = 0
+direction[2] = 1
+emb.add("<oov>", direction)
 
 env = atari_env("{}".format(args.env), env_conf, args)
 num_tests = 0

@@ -75,7 +75,7 @@ class A3Clstm(torch.nn.Module):
         # Initialising actor language layer weights
         if USE_LANGUAGE:
             self.actor_lang_linear.weight.data = norm_col_init(
-                self.lang_model.actor_lang_linear.weight.data, 0.01)
+                self.actor_lang_linear.weight.data, 0.01)
             self.actor_lang_linear.bias.data.fill_(0)
             self.lstm_enc.bias_ih.data.fill_(0)
             self.lstm_enc.bias_hh.data.fill_(0)

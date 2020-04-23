@@ -80,12 +80,16 @@ class Agent(object):
                 self.state = self.state.cuda()
         self.eps_len += 1
 
-        if self.args.render:
-            sent = []
-            for vec in vectors:
-                word = find_closest(self.emb, vec.squeeze(), return_word=True)
-                sent.append(word)
-            print(str(action) + " ".join(sent), len(sent))
+        if self.args.use_language:
+            if self.args.render:
+                if self.eps_len % 100 == 0:
+                    sent = []
+                    for vec in vectors:
+                        if vec.is_cuda:
+                            vec = vec.cpu()
+                        word = find_closest(self.emb, vec.squeeze().numpy(), return_word=True)
+                        sent.append(word)
+                    print(str(action) + " ".join(sent), len(sent))
         return self
 
     def clear_actions(self):

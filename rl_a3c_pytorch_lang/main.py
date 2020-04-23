@@ -53,21 +53,21 @@ if __name__ == '__main__':
         import gensim
         emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
 
-        # Append special words to the embedding model
-        direction = np.zeros(100)
-
-        direction[0] = 1
-        emb.add("<eos>", direction) # ignore the warning here
-        direction[1] = 1
-        emb.add("<pad>", direction)
-        direction[2] = 1
-        emb.add("<oov>", direction)
 
     else:
         emb = Embedding(args.emb_path, specific_vocab)
-        emb.add_word("<eos>")
-        emb.add_word("<pad>")
-        emb.add_word("<oov>", np.ones(emb.emb_dim))
+
+    # Append special words to the embedding model
+    direction = np.zeros(args.emb_dim)
+    direction[0] = 1
+    emb.add("<eos>", direction) # ignore the warning here
+    direction[0] = 0
+    direction[1] = 1
+    emb.add("<pad>", direction)
+    direction[1] = 0
+    direction[2] = 1
+    emb.add("<oov>", direction)
+
 
     # Creates a shared model and load from checkpoint
     shared_model = A3Clstm(env.observation_space.shape[0], env.action_space, emb)
@@ -77,7 +77,10 @@ if __name__ == '__main__':
             '{0}{1}.dat'.format(args.load_model_dir, args.env),
             map_location=lambda storage, loc: storage)
         # Restore the variable dictionary
-        shared_model.load_state_dict(saved_state)
+        model_state_dict = shared_model.state_dict()
+        for k, v in saved_state.items():
+            model_state_dict.update({k: v})
+        shared_model.load_state_dict(model_state_dict)
     shared_model.share_memory()
 
     if args.shared_optimizer:

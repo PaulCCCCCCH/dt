@@ -5,6 +5,7 @@ import torch.optim as optim
 from environment import atari_env
 from utils import ensure_shared_grads
 import numpy as np
+from scipy import spatial
 
 from model_lang import A3Clstm
 # from model import A3Clstm
@@ -130,8 +131,8 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
                 # print(produced_vectors)
                 # Get target vectors of the time step (an instruction corresponding to the least cost)
                 action_instructions = instructions[a]
-                losses = []
-                for instruction in action_instructions:
+                losses = torch.empty(len(action_instructions)).cuda()
+                for idx, instruction in enumerate(action_instructions):
 
                     # print(a, instruction)
                     ins_words = instruction.split()
@@ -142,21 +143,25 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
                             target_vectors.append(emb.get_vector(w))
                         else:
                             target_vectors.append(emb.get_vector('<oov>'))
+                    target_vectors = np.array(target_vectors)
 
                     # Add language cost to the accumulator
                     loss = 0
                     for pos, target_vector in enumerate(target_vectors):
                         curr_vector = produced_vectors[pos]
-                        """
-                        if np.array_equal(target_vector, eos_vector):
-                            break
-                        if np.array_equal(curr_vector, eos_vector):
-                            break
-                        """
-                        loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
-                    losses.append(loss)
+                        # if np.array_equal(target_vector, eos_vector):
+                        #    break
+                        # if np.array_equal(curr_vector, eos_vector):
+                        #    break
+                        ## TODO: Try different loss functions
+                        ## L2 loss
+                        # loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
+                        ## Cosine loss
+                        loss += torch.nn.functional.cosine_similarity(curr_vector.squeeze(), torch.from_numpy(target_vector).cuda(), dim=0)
 
-                language_loss = np.min(losses)
+                    losses[idx] = loss
+
+                language_loss = torch.min(losses)
 
             # Calculate other losses
             R = args.gamma * R + player.rewards[i]
@@ -185,14 +190,13 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
             (policy_loss + 0.5 * value_loss).backward()
 
         # (policy_loss + 0.5 * value_loss).backward()
-        """
         print("****************")
         print(policy_loss)
         print(value_loss)
-        print("****************")
-        """
         if args.use_language:
             print(language_loss)
+
+        print("****************")
         # """
         ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
         optimizer.step()

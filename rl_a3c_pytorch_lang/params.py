@@ -45,8 +45,7 @@ def get_args():
         help='Create a gym evaluation for upload')
     parser.add_argument(
         '--render',
-        default=False,
-        metavar='R',
+        action='store_true',
         help='Watch game as it being played')
     parser.add_argument(
         '--lr',
@@ -90,7 +89,7 @@ def get_args():
         metavar='SO',
         help='use an optimizer without shared statistics.')
     parser.add_argument(
-        '--load', default=False, metavar='L', help='load a trained model')
+        '--load', action='store_true', help='load a trained model')
     parser.add_argument(
         '--save-max',
         default=True,

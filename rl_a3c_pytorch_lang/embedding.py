@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import spatial
 from utils import read_pong_instructions
 
 def is_alpha(word):
@@ -50,12 +51,13 @@ class Embedding:
     def get_vector(self, word):
         return self.emb_mat[self._word_indices[word]]
 
-    def add_word(self, word, init=None):
+    def add(self, word, init=None):
         self._word_indices[word] = len(self.vocab)
         self.vocab.append(word)
         if init is None:
             # init = np.random.randn(self.emb_dim)
             init = np.zeros(self.emb_dim)
+        init = np.array(init)
         self.emb_mat = np.vstack((self.emb_mat, init))
 
     def distances(self, word_or_vec):
@@ -66,7 +68,8 @@ class Embedding:
         dists = []
         for w in self.vocab:
             target_vec = self.get_vector(w)
-            dist = np.sum(np.square(target_vec - word_vec))
+            # dist = np.sum(np.square(target_vec - word_vec))
+            dist = spatial.distance.cosine(target_vec, word_vec)
             dists.append(dist)
         return dists
 
@@ -76,9 +79,9 @@ if __name__ == '__main__':
     path = '../emb/glove_twitter_25d_changed.txt'
     instructions, specific_vocab = read_pong_instructions("./data/pong.txt")
     emb = Embedding(emb_path=path, specific_vocab=specific_vocab)
-    emb.add_word("<eos>")
-    emb.add_word("<pad>")
-    emb.add_word("<oov>")
+    emb.add("<eos>")
+    emb.add("<pad>")
+    emb.add("<oov>")
 
     print(len(emb.vocab))
     print(len(emb.emb_mat))
