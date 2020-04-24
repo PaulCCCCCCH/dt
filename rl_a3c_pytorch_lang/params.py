@@ -34,11 +34,6 @@ def get_args():
         metavar='M',
         help='maximum length of an episode (default: 100000)')
     parser.add_argument(
-        '--gpu-id',
-        type=int,
-        default=-1,
-        help='GPU to use [-1 CPU only] (default: -1)')
-    parser.add_argument(
         '--new-gym-eval',
         default=False,
         metavar='NGE',
@@ -142,6 +137,12 @@ def get_args():
         '--emb-dim',
         type=int,
         default=25
+    )
+
+    parser.add_argument(
+        '--emb-to-load',
+        type=int,
+        default=300,
     )
     parser.add_argument(
         '--lstm-size',

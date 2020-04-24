@@ -46,7 +46,7 @@ if __name__ == '__main__':
     env = atari_env(args.env, env_conf, args)
 
     # Reading instruction file
-    instructions, specific_vocab = read_pong_instructions("./data/pong.txt")
+    instructions, specific_vocab, bi_grams = read_pong_instructions("./data/pong.txt")
 
     # Read embedding model
     if args.use_full_emb:
@@ -67,6 +67,9 @@ if __name__ == '__main__':
     direction[1] = 0
     direction[2] = 1
     emb.add("<oov>", direction)
+    direction[2] = 0
+    direction[3] = 1
+    emb.add("<sos>", direction)
 
 
     # Creates a shared model and load from checkpoint
@@ -104,7 +107,7 @@ if __name__ == '__main__':
     # Start seperate workers
     for rank in range(0, args.workers):
         p = mp.Process(
-            target=train, args=(rank, args, shared_model, optimizer, env_conf, emb, instructions))
+            target=train, args=(rank, args, shared_model, optimizer, env_conf, emb, bi_grams))
         p.start()
         processes.append(p)
         time.sleep(0.1)

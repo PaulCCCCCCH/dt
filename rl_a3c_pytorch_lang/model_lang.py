@@ -13,6 +13,7 @@ class A3Clstm(torch.nn.Module):
     def __init__(self, num_inputs, action_space, emb):
         self.alpha = 0.2  # Weight for language component
         self.emb = emb
+        self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()
 
         super(A3Clstm, self).__init__()
         self.conv1 = nn.Conv2d(num_inputs, 32, 5, stride=1, padding=2)
@@ -34,16 +35,16 @@ class A3Clstm(torch.nn.Module):
         if USE_LANGUAGE:
 
             # LSTM for encoding state into language for actor
-            self.lstm_enc = nn.LSTMCell(EMB_DIM, EMB_DIM)
+            self.lstm_enc = nn.LSTMCell(len(emb.vocab), len(emb.vocab))
 
             # LSTM for decoding state
-            self.lstm_dec = nn.LSTMCell(EMB_DIM, EMB_DIM)
+            self.lstm_dec = nn.LSTMCell(EMB_DIM, args.lstm_size)
 
             # Actor (Logits from decoder -> Action logits)
-            self.actor_lang_linear = nn.Linear(EMB_DIM, num_outputs)
+            self.actor_lang_linear = nn.Linear(args.lstm_size, num_outputs)
 
             # Actor (State -> State repr for language model)
-            self.actor_lang_prep = nn.Linear(args.lstm_size, EMB_DIM)
+            self.actor_lang_prep = nn.Linear(args.lstm_size, len(emb.vocab))
 
         # Critic (State -> Value)
         self.critic_linear = nn.Linear(args.lstm_size, 1)
@@ -102,21 +103,32 @@ class A3Clstm(torch.nn.Module):
         actor_fc = self.actor_linear(x)
 
         if USE_LANGUAGE:
+            # actor_lang_input = torch.softmax(self.actor_lang_prep(x), dim=0)
             actor_lang_input = self.actor_lang_prep(x)
 
             # Encoder
+            """
             hx_enc = torch.zeros_like(actor_lang_input)
             cx_enc = torch.zeros_like(actor_lang_input)
+            """
+            hx_enc = torch.zeros_like(actor_lang_input)
+            cx_enc = actor_lang_input
+
             encoder_output_vectors = []
+            encoder_output_logits = []
             inp = actor_lang_input
             for _ in range(10): # TODO: 10 is a hyper parameter (seq len)
                 hx_enc, cx_enc = self.lstm_enc(inp, (hx_enc, cx_enc))
-                inp = hx_enc
-                encoder_output_vectors.append(hx_enc)
+                encoder_output_logits.append(hx_enc)
+                encoder_output_vectors.append(torch.mm(hx_enc, self.emb_mat))
 
             # Decoder
-            hx_dec = torch.zeros_like(hx_enc)
-            cx_dec = torch.zeros_like(hx_enc)
+            """
+            Since hx_enc will not be available during testing (instruction is given), use all
+            zero here
+            """
+            hx_dec = torch.zeros(1, args.lstm_size).cuda()
+            cx_dec = torch.zeros(1, args.lstm_size).cuda()
             for i in range(10):
                 hx_dec, cx_dec = self.lstm_dec(encoder_output_vectors[i], (hx_dec, cx_dec))
 
@@ -124,7 +136,8 @@ class A3Clstm(torch.nn.Module):
         else:
             actor_lang = 0
             encoder_output_vectors = None
+            encoder_output_logits = None
 
         actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
 
-        return encoder_output_vectors, critic_out, actor_out, (hx, cx)
+        return (encoder_output_vectors, encoder_output_logits), critic_out, actor_out, (hx, cx)

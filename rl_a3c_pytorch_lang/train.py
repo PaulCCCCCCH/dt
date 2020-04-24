@@ -3,7 +3,7 @@ from setproctitle import setproctitle as ptitle
 import torch
 import torch.optim as optim
 from environment import atari_env
-from utils import ensure_shared_grads
+from utils import ensure_shared_grads, find_closest
 import numpy as np
 from scipy import spatial
 
@@ -14,14 +14,15 @@ from player_util_lang import Agent
 from torch.autograd import Variable
 
 
-def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
+def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams):
     # Changes the process name
     ptitle('Training Agent: {}'.format(rank))
     gpu_id = args.gpu_ids[rank % len(args.gpu_ids)]
     torch.manual_seed(args.seed + rank)
 
-    # Define <eos> (end-of-sentence) vector
+    # Define special vectors
     eos_vector = emb.get_vector("<eos>")
+    oov_vector = emb.get_vector("<oov>")
 
     if gpu_id >= 0:
         torch.cuda.manual_seed(args.seed + rank)
@@ -121,11 +122,12 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
         # Accumulate the losses
         for i in reversed(range(len(player.rewards))):
 
+            # Calculating language loss
             if args.use_language:
-                # Calculating language loss
+                # None probabilistic loss
+                """
                 # Get action of a time step
                 a = np.argmax(player.log_probs[i].detach().cpu().numpy())
-
                 # Get produced vectors of the time step
                 produced_vectors = player.produced_vectors[i]
                 # print(produced_vectors)
@@ -162,6 +164,30 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, instructions):
                     losses[idx] = loss
 
                 language_loss = torch.min(losses)
+                """
+
+                # Probabilistic loss
+                a = np.argmax(player.log_probs[i].detach().cpu().numpy())
+                bi_gram = bi_grams[a]
+                produced_vectors = player.produced_vectors[i]
+                produced_logits = player.produced_logits[i]
+                prev_word = "<sos>"
+                for pos, produced_logit in enumerate(produced_logits):
+                    word_idx = torch.argmax(produced_logit)
+                    word = emb.index2entity[word_idx]
+                    target_logit = torch.zeros(len(emb.vocab)).cuda()
+
+                    if prev_word in bi_gram.keys():
+                        probs_dict = bi_gram[prev_word]
+                        for w, v in probs_dict.items():
+                            target_logit[emb.get_index(w)] = v
+                    else:
+                        target_logit[emb.get_index('<oov>')] = 1
+
+                    #language_loss += torch.nn.functional.cross_entropy(produced_logit, target_logit.unsqueeze(0))
+                    language_loss += torch.nn.functional.mse_loss(produced_logit, target_logit.unsqueeze(0))
+
+                    prev_word = word
 
             # Calculate other losses
             R = args.gamma * R + player.rewards[i]

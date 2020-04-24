@@ -1,9 +1,11 @@
 Now
 
 Done. Use pad so that there is no need to calculate 'closest' during training
-1. Allow continuing from checkpoint
-2. Allow training separately
-3. Loss function update
+Done. Allow continuing from checkpoint
+Done. Allow training separately
+Done. Loss function update
+1. Weighted embedding may not work very well.
+
 
 Experiment
 

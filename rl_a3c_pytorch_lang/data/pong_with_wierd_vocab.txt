@@ -1,28 +1,43 @@
+0%%%dont impress
+0%%%run dont move
 0%%%dont move
+0%%%kibosh stop
 0%%%stop
 0%%%stay still
+0%%%stay stick still
+0%%%stop kibosh moving
 0%%%stop moving
 0%%%quit moving
 0%%%stop doing anything
 0%%%quit doing anything
 0%%%stop anything doing
+0%%%where stay you are
 0%%%stay where you are
+0%%%stay where you
 0%%%halt
 0%%%stay 
+0%%%stick stay
+0%%%nothing do
 0%%%do nothing
 0%%%dont go anywhere
 0%%%dont do anything
+0%%%anything do dont
 0%%%no
 0%%%hold along on
 0%%%hold on
 0%%%on hold
+0%%%go dont
 0%%%dont extend
 0%%%dont go
 0%%%dont run
 0%%%run dont
+0%%%pass dont run
+0%%%stick stay there
 0%%%stay there
+0%%%abide there
 0%%%there stay
 0%%%stay there
+0%%%stop kibosh moving
 0%%%stop moving
 0%%%cease moving
 2%%%upward up
@@ -35,6 +50,7 @@
 2%%%upwards
 2%%%upwards
 2%%%higher
+2%%%gamey higher
 2%%%up go
 2%%%go up
 2%%%climb up
@@ -42,6 +58,8 @@
 2%%%move upwards
 2%%%upward move upwards
 2%%%move upward
+2%%%adam go higher
+2%%%go mellow
 2%%%go higher
 2%%%higher move
 2%%%move higher
@@ -67,6 +85,7 @@
 3%%%down
 3%%%downwards
 3%%%keep going down
+3%%%pass keep going down
 3%%%hold on going down
 3%%%downward
 3%%%downwards downward
@@ -75,6 +94,7 @@
 3%%%run move downwards
 3%%%move downwards
 3%%%downwards move
+3%%%go modest lower
 3%%%lower go
 3%%%to a lower location
 3%%%to a lower position
@@ -95,8 +115,10 @@
 3%%%modest lower
 3%%%down
 3%%%move lower
+3%%%modest move lower
 3%%%travel downwards
 3%%%downwards travel
+3%%%jaunt downwards
 3%%%journey down
 3%%%travel down
 3%%%down

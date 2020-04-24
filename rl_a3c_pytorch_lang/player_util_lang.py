@@ -9,6 +9,7 @@ class Agent(object):
     def __init__(self, model, env, args, state, emb):
         self.emb = emb
         self.produced_vectors = []
+        self.produced_logits = []
         self.target_vectors = []
 
         self.model = model
@@ -31,13 +32,14 @@ class Agent(object):
     # Run a step and save observations in the lists. These will be
     # fetched for updating weights in the future.
     def action_train(self):
-        vectors, value, logit, (self.hx, self.cx) = self.model((Variable(
+        (vectors, logits), value, logit, (self.hx, self.cx) = self.model((Variable(
             self.state.unsqueeze(0)), (self.hx, self.cx)))
         prob = F.softmax(logit, dim=1)
         log_prob = F.log_softmax(logit, dim=1)
         entropy = -(log_prob * prob).sum(1)
         self.entropies.append(entropy)
         self.produced_vectors.append(vectors)
+        self.produced_logits.append(logits)
         action = prob.multinomial(1).data
         log_prob = log_prob.gather(1, Variable(action))
         # Step
@@ -68,7 +70,7 @@ class Agent(object):
             else:
                 self.cx = Variable(self.cx.data)
                 self.hx = Variable(self.hx.data)
-            vectors, value, logit, (self.hx, self.cx) = self.model((Variable(
+            (vectors, logits), value, logit, (self.hx, self.cx) = self.model((Variable(
                 self.state.unsqueeze(0)), (self.hx, self.cx)))
 
         prob = F.softmax(logit, dim=1)
@@ -98,4 +100,5 @@ class Agent(object):
         self.rewards = []
         self.entropies = []
         self.produced_vectors = []
+        self.produced_logits = []
         return self

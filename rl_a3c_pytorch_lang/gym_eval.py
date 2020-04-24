@@ -16,14 +16,13 @@ from params import args
 
 #undo_logger_setup()
 
-
 setup_json = read_config(args.env_config)
 env_conf = setup_json["Default"]
 for i in setup_json.keys():
     if i in args.env:
         env_conf = setup_json[i]
 
-gpu_id = args.gpu_id
+gpu_id = args.gpu_ids
 
 torch.manual_seed(args.seed)
 if gpu_id >= 0:
@@ -44,7 +43,7 @@ for k in d_args.keys():
     log['{}_mon_log'.format(args.env)].info('{0}: {1}'.format(k, d_args[k]))
 
 
-_, specific_vocab = read_pong_instructions("./data/pong.txt")
+_, specific_vocab, _ = read_pong_instructions("./data/pong.txt")
 
 # Read embedding model
 if args.use_full_emb:
@@ -66,6 +65,9 @@ emb.add("<pad>", direction)
 direction[1] = 0
 direction[2] = 1
 emb.add("<oov>", direction)
+direction[2] = 0
+direction[3] = 1
+emb.add("<sos>", direction)
 
 env = atari_env("{}".format(args.env), env_conf, args)
 num_tests = 0
@@ -74,10 +76,7 @@ reward_total_sum = 0
 player = Agent(None, env, args, None, emb)
 player.model = A3Clstm(player.env.observation_space.shape[0],
                        player.env.action_space, emb)
-player.gpu_id = gpu_id
-if gpu_id >= 0:
-    with torch.cuda.device(gpu_id):
-        player.model = player.model.cuda()
+
 if args.new_gym_eval:
     player.env = gym.wrappers.Monitor(
         player.env, "{}_monitor".format(args.env), force=True)
@@ -87,6 +86,11 @@ if gpu_id >= 0:
         player.model.load_state_dict(saved_state)
 else:
     player.model.load_state_dict(saved_state)
+
+player.gpu_id = gpu_id
+if gpu_id >= 0:
+    with torch.cuda.device(gpu_id):
+        player.model = player.model.cuda()
 
 player.model.eval()
 for i_episode in range(args.num_episodes):

@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import spatial
 from utils import read_pong_instructions
+from params import args
 
 def is_alpha(word):
     try:
@@ -12,7 +13,7 @@ def is_alpha(word):
 class Embedding:
     def __init__(self, emb_path, specific_vocab=None):
         self.emb_dim = 25
-        self.emb_to_load = 1000
+        self.emb_to_load = args.emb_to_load
         self.vocab = []
         self.emb_mat = None
         self._specific_vocab = specific_vocab
@@ -73,11 +74,14 @@ class Embedding:
             dists.append(dist)
         return dists
 
+    def get_index(self, word):
+        return self._word_indices[word]
+
 
 if __name__ == '__main__':
     # Test
     path = '../emb/glove_twitter_25d_changed.txt'
-    instructions, specific_vocab = read_pong_instructions("./data/pong.txt")
+    instructions, specific_vocab, _ = read_pong_instructions("./data/pong.txt")
     emb = Embedding(emb_path=path, specific_vocab=specific_vocab)
     emb.add("<eos>")
     emb.add("<pad>")
