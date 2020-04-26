@@ -99,7 +99,7 @@ if __name__ == '__main__':
     processes = []
 
     # Start tester
-    p = mp.Process(target=test, args=(args, shared_model, env_conf, emb))
+    p = mp.Process(target=test, args=(args, shared_model, env_conf, emb, bi_grams, instructions))
     p.start()
     processes.append(p)
     time.sleep(0.1)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # Start seperate workers
     for rank in range(0, args.workers):
         p = mp.Process(
-            target=train, args=(rank, args, shared_model, optimizer, env_conf, emb, bi_grams))
+            target=train, args=(rank, args, shared_model, optimizer, env_conf, emb, bi_grams, instructions))
         p.start()
         processes.append(p)
         time.sleep(0.1)

@@ -5,6 +5,7 @@ import torch.optim as optim
 from environment import atari_env
 from utils import ensure_shared_grads, find_closest
 import numpy as np
+import random
 from scipy import spatial
 
 from model_lang import A3Clstm
@@ -14,7 +15,7 @@ from player_util_lang import Agent
 from torch.autograd import Variable
 
 
-def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams):
+def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams, instructions):
     # Changes the process name
     ptitle('Training Agent: {}'.format(rank))
     gpu_id = args.gpu_ids[rank % len(args.gpu_ids)]
@@ -56,6 +57,8 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams):
 
     # Start iteration
     player.eps_len += 2
+
+    _counter = 0
     while True:
 
         # Loading param values from shared model
@@ -124,70 +127,35 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams):
 
             # Calculating language loss
             if args.use_language:
-                # None probabilistic loss
-                """
+
+                # Calculating language loss
                 # Get action of a time step
-                a = np.argmax(player.log_probs[i].detach().cpu().numpy())
+                a = np.argmax(player.action_logits[i].detach().cpu().numpy())
+
                 # Get produced vectors of the time step
-                produced_vectors = player.produced_vectors[i]
+                produced_logits = player.produced_logits[i]
                 # print(produced_vectors)
                 # Get target vectors of the time step (an instruction corresponding to the least cost)
                 action_instructions = instructions[a]
-                losses = torch.empty(len(action_instructions)).cuda()
-                for idx, instruction in enumerate(action_instructions):
 
-                    # print(a, instruction)
-                    ins_words = instruction.split()
-                    # Building target vector
-                    target_vectors = []
-                    for w in ins_words:
-                        if w in emb.vocab:
-                            target_vectors.append(emb.get_vector(w))
-                        else:
-                            target_vectors.append(emb.get_vector('<oov>'))
-                    target_vectors = np.array(target_vectors)
+                # Sample a few from the set
+                for _ in range(10):
+                    idx = random.randrange(0, len(action_instructions))
+                    instruction = action_instructions[idx]
 
-                    # Add language cost to the accumulator
-                    loss = 0
-                    for pos, target_vector in enumerate(target_vectors):
-                        curr_vector = produced_vectors[pos]
-                        # if np.array_equal(target_vector, eos_vector):
-                        #    break
-                        # if np.array_equal(curr_vector, eos_vector):
-                        #    break
-                        ## TODO: Try different loss functions
-                        ## L2 loss
-                        # loss += torch.mean((curr_vector - torch.from_numpy(target_vector).cuda()) ** 2)
-                        ## Cosine loss
-                        loss += torch.nn.functional.cosine_similarity(curr_vector.squeeze(), torch.from_numpy(target_vector).cuda(), dim=0)
 
-                    losses[idx] = loss
+                    target_words = instruction.split()
 
-                language_loss = torch.min(losses)
-                """
+                    for pos, target_word in enumerate(target_words):
+                        target_class = torch.tensor(emb.get_index(target_word)).cuda()
+                        produced_logit = produced_logits[pos]
 
-                # Probabilistic loss
-                a = np.argmax(player.log_probs[i].detach().cpu().numpy())
-                bi_gram = bi_grams[a]
-                produced_vectors = player.produced_vectors[i]
-                produced_logits = player.produced_logits[i]
-                prev_word = "<sos>"
-                for pos, produced_logit in enumerate(produced_logits):
-                    word_idx = torch.argmax(produced_logit)
-                    word = emb.index2entity[word_idx]
-                    target_logit = torch.zeros(len(emb.vocab)).cuda()
+                        # Cross_entropy combines log-softmax and nll
+                        # Here procuded_vec is one-hot while target is an integer
+                        language_loss += torch.nn.functional.cross_entropy(produced_logit, target_class.unsqueeze(0))
+                        if target_word == '<eos>':
+                            break
 
-                    if prev_word in bi_gram.keys():
-                        probs_dict = bi_gram[prev_word]
-                        for w, v in probs_dict.items():
-                            target_logit[emb.get_index(w)] = v
-                    else:
-                        target_logit[emb.get_index('<oov>')] = 1
-
-                    #language_loss += torch.nn.functional.cross_entropy(produced_logit, target_logit.unsqueeze(0))
-                    language_loss += torch.nn.functional.mse_loss(produced_logit, target_logit.unsqueeze(0))
-
-                    prev_word = word
 
             # Calculate other losses
             R = args.gamma * R + player.rewards[i]
@@ -211,19 +179,24 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams):
 
         # Calculate grad and update
         if args.use_language:
-            (policy_loss + 0.5 * value_loss + 0.1 * language_loss).backward()
+            (policy_loss + 0.5 * value_loss + 0.1 * 0.01* language_loss).backward()
         else:
             (policy_loss + 0.5 * value_loss).backward()
 
+        """
         # (policy_loss + 0.5 * value_loss).backward()
         print("****************")
         print(policy_loss)
         print(value_loss)
-        if args.use_language:
-            print(language_loss)
-
-        print("****************")
         # """
+        if args.use_language and _counter % 10 == 0:
+            print("****************")
+            #print(policy_loss)
+            #print(value_loss)
+            print("language loss", language_loss)
+        _counter += 1
+
+        # Copying over the parameters to shared model
         ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
         optimizer.step()
 

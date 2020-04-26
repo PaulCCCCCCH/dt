@@ -28,6 +28,10 @@ def get_args():
         metavar='RF',
         help='Frequency to watch rendered game play')
     parser.add_argument(
+        '--rand-gen',
+        action='store_true',
+        help='Randomise language generation')
+    parser.add_argument(
         '--max-episode-length',
         type=int,
         default=10000,
@@ -38,6 +42,10 @@ def get_args():
         default=False,
         metavar='NGE',
         help='Create a gym evaluation for upload')
+    parser.add_argument(
+        '--manual-control',
+        action='store_true',
+        help='Enabling manual control. Only works during evaluation')
     parser.add_argument(
         '--render',
         action='store_true',

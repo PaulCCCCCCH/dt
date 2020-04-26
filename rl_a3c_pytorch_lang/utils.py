@@ -92,7 +92,6 @@ def read_pong_instructions(path):
             parts = line[:-1].split('%%%')
             label = int(parts[0])
             sentence = parts[1]
-            sentence = "<sos> " + sentence
             sentence += " <eos>"
             while len(sentence.split()) < 10:
                 sentence += " <pad>"
@@ -146,6 +145,73 @@ def read_pong_instructions(path):
                 new_bi_grams[a][w1][w2] = bi_gram[w1][w2] / count
 
     return instruction_sets, vocab_set, new_bi_grams
+
+
+def read_mr_instructions(path):
+    instruction_sets = {0: [], 1: [], 2: [], 3: [], 4: [], 5: []}
+    bi_grams = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}}
+    vocab_set = set()
+    with open(path, "r") as f:
+
+        lines = f.readlines()
+
+        for i, line in enumerate(lines):
+            parts = line[:-1].split('\t')
+            sentence = parts[1]
+            sentence += " <eos>"
+            while len(sentence.split()) < 10:
+                sentence += " <pad>"
+
+            # Adding words in the instructions to the vocabulary
+            for w in sentence.split():
+                vocab_set.add(w)
+
+            # Building bi-gram model
+            bi_gram = bi_grams[label]
+            sent_words = sentence.split()
+            for pos in range(len(sent_words) - 1):
+
+                curr_word = sent_words[pos]
+                next_word = sent_words[pos + 1]
+
+                if curr_word not in bi_gram:
+                    bi_gram[curr_word] = {}
+
+                if next_word not in bi_gram[curr_word]:
+                    bi_gram[curr_word][next_word] = 1
+                else:
+                    bi_gram[curr_word][next_word] += 1
+            if label == 2:
+                bi_grams[4] = bi_gram
+            elif label == 3:
+                bi_grams[5] = bi_gram
+            elif label == 0:
+                bi_grams[1] = bi_gram
+
+
+            # Classifying instructions
+            if label == 2:
+                instruction_sets[2].append(sentence)
+                instruction_sets[4].append(sentence)
+            elif label == 3:
+                instruction_sets[3].append(sentence)
+                instruction_sets[5].append(sentence)
+            elif label == 0:
+                instruction_sets[0].append(sentence)
+                instruction_sets[1].append(sentence)
+
+    new_bi_grams = {}
+    for a in range(len(bi_grams)):
+        new_bi_grams[a] = {}
+        bi_gram = bi_grams[a]
+        for w1 in bi_gram.keys():
+            new_bi_grams[a][w1] = {}
+            count = float(sum(bi_gram[w1].values()))
+            for w2 in bi_gram[w1].keys():
+                new_bi_grams[a][w1][w2] = bi_gram[w1][w2] / count
+
+    return instruction_sets, vocab_set, new_bi_grams
+
 
 if __name__ == '__main__':
     ins_set, vocab_set, bi_grams = read_pong_instructions("./data/pong.txt")

@@ -10,7 +10,7 @@ import time
 import logging
 
 
-def test(args, shared_model, env_conf, emb):
+def test(args, shared_model, env_conf, emb, bi_grams, instructions):
     ptitle('Test Agent')
     gpu_id = args.gpu_ids[-1]
     log = {}
@@ -76,7 +76,7 @@ def test(args, shared_model, env_conf, emb):
                                   time.gmtime(time.time() - start_time)),
                     reward_sum, player.eps_len, reward_mean))
 
-            if args.save_max and reward_sum >= max_score:
+            if (args.save_max and reward_sum >= max_score) or args.use_language:
                 max_score = reward_sum
                 if gpu_id >= 0:
                     with torch.cuda.device(gpu_id):

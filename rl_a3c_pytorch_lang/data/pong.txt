@@ -29,7 +29,6 @@
 2%%%up
 2%%%keep going up
 2%%%keep observe going up
-2%%%hold back going up
 2%%%upwards upward
 2%%%upward
 2%%%upwards
@@ -45,14 +44,11 @@
 2%%%go higher
 2%%%higher move
 2%%%move higher
-2%%%move position a higher to
-2%%%move to antiophthalmic factor a higher position
 2%%%move to a higher position
 2%%%go to a higher position
 2%%%move to run a higher location
 2%%%to a higher location
 2%%%to a higher position
-2%%%location to a higher move
 2%%%move to a higher location
 2%%%go up ascend
 2%%%ascend
@@ -61,21 +57,17 @@
 2%%%travel up
 2%%%upwards travel
 2%%%travel upwards
-2%%%travel upward up
 2%%%up travel
 2%%%travel up
 3%%%down
 3%%%downwards
 3%%%keep going down
-3%%%hold on going down
 3%%%downward
 3%%%downwards downward
 3%%%down go
 3%%%go down
-3%%%run move downwards
 3%%%move downwards
 3%%%downwards move
-3%%%lower go
 3%%%to a lower location
 3%%%to a lower position
 3%%%go lower
@@ -92,7 +84,6 @@
 3%%%descend
 3%%%come down
 3%%%lower
-3%%%modest lower
 3%%%down
 3%%%move lower
 3%%%travel downwards

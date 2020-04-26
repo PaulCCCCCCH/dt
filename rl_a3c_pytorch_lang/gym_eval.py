@@ -43,7 +43,7 @@ for k in d_args.keys():
     log['{}_mon_log'.format(args.env)].info('{0}: {1}'.format(k, d_args[k]))
 
 
-_, specific_vocab, _ = read_pong_instructions("./data/pong.txt")
+instructions, specific_vocab, bi_grams = read_pong_instructions("./data/pong.txt")
 
 # Read embedding model
 if args.use_full_emb:
@@ -105,8 +105,17 @@ for i_episode in range(args.num_episodes):
         if args.render:
             if i_episode % args.render_freq == 0:
                 player.env.render()
+        manual_language_input = None
+        if args.manual_control:
+        # if player.eps_len % 50 == 0 and args.manual_control:
+            print("Input manual control command")
+            manual_language_input = input()
+            manual_language_input += " <eos>"
+            manual_language_input = manual_language_input.split()
+            while len(manual_language_input) < 10:
+                manual_language_input.append("<pad>")
 
-        player.action_test()
+        player.action_test(manual_language_input)
         reward_sum += player.reward
 
         if player.done and not player.info:

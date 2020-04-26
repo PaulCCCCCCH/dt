@@ -23,6 +23,7 @@ class Agent(object):
         self.log_probs = []
         self.rewards = []
         self.entropies = []
+        self.action_logits = []
 
         self.done = True
         self.info = None
@@ -37,6 +38,7 @@ class Agent(object):
         prob = F.softmax(logit, dim=1)
         log_prob = F.log_softmax(logit, dim=1)
         entropy = -(log_prob * prob).sum(1)
+        self.action_logits.append(logit)
         self.entropies.append(entropy)
         self.produced_vectors.append(vectors)
         self.produced_logits.append(logits)
@@ -55,7 +57,7 @@ class Agent(object):
         self.rewards.append(self.reward)
         return self
 
-    def action_test(self):
+    def action_test(self, manual_language_input=None):
         with torch.no_grad():
             if self.done:
                 if self.gpu_id >= 0:
@@ -70,8 +72,21 @@ class Agent(object):
             else:
                 self.cx = Variable(self.cx.data)
                 self.hx = Variable(self.hx.data)
-            (vectors, logits), value, logit, (self.hx, self.cx) = self.model((Variable(
+
+            # TODO: This is only for comparison
+            (vectors_, logits_), value_, logit_, (_, _) = self.model((Variable(
                 self.state.unsqueeze(0)), (self.hx, self.cx)))
+
+
+            (vectors, logits), value, logit, (self.hx, self.cx) = self.model((Variable(
+                self.state.unsqueeze(0)), (self.hx, self.cx)), manual_language_input)
+
+
+
+
+        # TODO: This is only for comparison
+        prob_ = F.softmax(logit_, dim=1)
+        action_ = prob_.max(1)[1].data.cpu().numpy()
 
         prob = F.softmax(logit, dim=1)
         action = prob.max(1)[1].data.cpu().numpy()
@@ -85,13 +100,38 @@ class Agent(object):
         if self.args.use_language:
             if self.args.render:
                 if self.eps_len % 100 == 0:
+                # if self.eps_len % 1 == 0:
+
                     sent = []
+                    # Deterministic language generation using output embedding matching
+                    """
                     for vec in vectors:
                         if vec.is_cuda:
                             vec = vec.cpu()
                         word = find_closest(self.emb, vec.squeeze().numpy(), return_word=True)
                         sent.append(word)
-                    print(str(action) + " ".join(sent), len(sent))
+                    """
+
+                    if self.args.rand_gen:
+                        # Probabilistic language generation using logits
+                        for logit in logits:
+                            logit = torch.nn.functional.softmax(logit)
+                            idx = torch.multinomial(logit, 1)
+                            word = self.emb.vocab[idx]
+                            sent.append(word)
+
+                    else:
+                        # Deterministic language generation using logits
+
+                        sent = []
+                        for logit in logits:
+                            idx = torch.argmax(logit)
+                            word = self.emb.vocab[idx]
+                            sent.append(word)
+
+                    print(str(action), str(action_) + " ".join(sent), len(sent))
+
+
         return self
 
     def clear_actions(self):
@@ -101,4 +141,5 @@ class Agent(object):
         self.entropies = []
         self.produced_vectors = []
         self.produced_logits = []
+        self.action_logits = []
         return self

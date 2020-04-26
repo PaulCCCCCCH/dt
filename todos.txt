@@ -4,7 +4,17 @@ Done. Use pad so that there is no need to calculate 'closest' during training
 Done. Allow continuing from checkpoint
 Done. Allow training separately
 Done. Loss function update
-1. Weighted embedding may not work very well.
+-. Weighted embedding may not work very well.
+-. Deal with OOV elegantly
+-. Improve produced language
+-. Finish manual control for pong
+-. Try other games
+
+-. Try probabilistic generation during eval
+-. Pre-train language model separately
+
+Last resort:
+Building the vocabulary from the instructions alone
 
 
 Experiment
