@@ -2,139 +2,129 @@ from __future__ import division
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import norm_col_init, weights_init
+from embedding import Embedding
+from utils import norm_col_init, weights_init, find_closest, read_mr_instructions, to_one_hot
 from params import args
+import random
+import numpy as np
+import torch.optim as optim
+import os
 
-USE_LANGUAGE = args.use_language
-EMB_DIM = args.emb_dim
-
+EMB_DIM = 25
+LSTM_SIZE = 100
+MAX_ITER = 10
 
 class LangModel(torch.nn.Module):
-    def __init__(self, num_inputs, action_space, emb):
+    def __init__(self, emb):
+        super(LangModel, self).__init__()
+
+        self.alpha = 0.5  # Weight for language component
         self.emb = emb
-        self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()
+        self.emb_mat = torch.nn.Parameter(torch.from_numpy(emb.emb_mat).to(dtype=torch.float), requires_grad=True)
+        # self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()
 
-        super(A3Clstm, self).__init__()
-        self.conv1 = nn.Conv2d(num_inputs, 32, 5, stride=1, padding=2)
-        self.maxp1 = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(32, 32, 5, stride=1, padding=1)
-        self.maxp2 = nn.MaxPool2d(2, 2)
-        self.conv3 = nn.Conv2d(32, 64, 4, stride=1, padding=1)
-        self.maxp3 = nn.MaxPool2d(2, 2)
-        self.conv4 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
-        self.maxp4 = nn.MaxPool2d(2, 2)
+        # LSTM for encoding state into language for actor
+        self.lstm_enc = nn.LSTMCell(EMB_DIM, LSTM_SIZE)
 
-        # 1024 = 64 * 64 / 4
+        # LSTM for encoding state into language for actor
+        self.linear_lang_gen = nn.Linear(LSTM_SIZE, len(emb.vocab))
 
-        self.flatten = nn.Linear(1024, args.lstm_size)
-
-        self.lstm = nn.LSTMCell(args.lstm_size, args.lstm_size)
-        num_outputs = action_space.n
-
-        if USE_LANGUAGE:
-
-            # LSTM for encoding state into language for actor
-            self.lstm_enc = nn.LSTMCell(args.lstm_size, args.lstm_size)
-
-            # LSTM for encoding state into language for actor
-            self.linear_lang_gen = nn.Linear(args.lstm_size, len(emb.vocab))
-
-        # Critic (State -> Value)
-        self.critic_linear = nn.Linear(args.lstm_size, 1)
-
-        # Actor (State -> Action logits)
-        self.actor_linear = nn.Linear(args.lstm_size, num_outputs)
-
-
-
-        # Define the language model
-
+        # Initialisation
         self.apply(weights_init)
-        relu_gain = nn.init.calculate_gain('relu')
-        self.conv1.weight.data.mul_(relu_gain)
-        self.conv2.weight.data.mul_(relu_gain)
-        self.conv3.weight.data.mul_(relu_gain)
-        self.conv4.weight.data.mul_(relu_gain)
-        self.actor_linear.weight.data = norm_col_init(
-            self.actor_linear.weight.data, 0.01)
-        self.actor_linear.bias.data.fill_(0)
-
-        self.critic_linear.weight.data = norm_col_init(
-            self.critic_linear.weight.data, 1.0)
-        self.critic_linear.bias.data.fill_(0)
-
-        self.lstm.bias_ih.data.fill_(0)
-        self.lstm.bias_hh.data.fill_(0)
 
         # Initialising actor language layer weights
-        if USE_LANGUAGE:
-            self.actor_lang_linear.weight.data = norm_col_init(
-                self.actor_lang_linear.weight.data, 0.01)
-            self.actor_lang_linear.bias.data.fill_(0)
-            self.lstm_enc.bias_ih.data.fill_(0)
-            self.lstm_enc.bias_hh.data.fill_(0)
-
-            self.lstm_dec.bias_ih.data.fill_(0)
-            self.lstm_dec.bias_hh.data.fill_(0)
+        self.lstm_enc.bias_ih.data.fill_(0)
+        self.lstm_enc.bias_hh.data.fill_(0)
 
         self.train()
 
-    def forward(self, inputs):
-        inputs, (hx, cx) = inputs
-        x = F.relu(self.maxp1(self.conv1(inputs)))
-        x = F.relu(self.maxp2(self.conv2(x)))
-        x = F.relu(self.maxp3(self.conv3(x)))
-        x = F.relu(self.maxp4(self.conv4(x)))
+    def forward(self, inputs, is_train=True):
+        """
+        Expect inputs to be one-hot tensor of shape [SeqLength, VocabSize]
+        """
+        encoder_output_logits = []
 
-        x = x.view(x.size(0), -1)
-        x = self.flatten(x)
+        # Shape [SeqLength, EmbeddingDim]
+        x_emb = torch.mm(inputs, self.emb_mat)
 
-        hx, cx = self.lstm(x, (hx, cx))
+        hx_enc = torch.zeros(1, LSTM_SIZE).cuda()
+        cx_enc = torch.zeros(1, LSTM_SIZE).cuda()
 
-        x = hx
-        critic_out = self.critic_linear(x)
-        actor_fc = self.actor_linear(x)
-
-        if USE_LANGUAGE:
-            # actor_lang_input = torch.softmax(self.actor_lang_prep(x), dim=0)
-            actor_lang_input = self.actor_lang_prep(x)
-
-            # Encoder
-            """
-            hx_enc = torch.zeros_like(actor_lang_input)
-            cx_enc = torch.zeros_like(actor_lang_input)
-            """
-            hx_enc = torch.zeros_like(actor_lang_input)
-            cx_enc = actor_lang_input
-
-            encoder_output_vectors = []
-            encoder_output_logits = []
-            inp = actor_lang_input
-            for _ in range(10): # TODO: 10 is a hyper parameter (seq len)
-                hx_enc, cx_enc = self.lstm_enc(inp, (hx_enc, cx_enc))
+        if is_train:
+            for i in range(x_emb.shape[0]):
+                hx_enc, cx_enc = self.lstm_enc(x_emb[i].unsqueeze(0), (hx_enc, cx_enc))
+                # Shape [1, vocab_size]
                 lang_logit = self.linear_lang_gen(hx_enc)
                 encoder_output_logits.append(lang_logit)
-                encoder_output_vectors.append(torch.mm(lang_logit, self.emb_mat))
-
-            # Decoder
-            """
-            Since hx_enc will not be available during testing (instruction is given), use all
-            zero here
-            """
-            hx_dec = torch.zeros(1, args.lstm_size).cuda()
-            cx_dec = torch.zeros(1, args.lstm_size).cuda()
-            for i in range(10):
-                hx_dec, cx_dec = self.lstm_dec(encoder_output_vectors[i], (hx_dec, cx_dec))
-
-            actor_lang = self.actor_lang_linear(hx_dec)
         else:
-            actor_lang = 0
-            encoder_output_vectors = None
-            encoder_output_logits = None
+            word = None
+            input_emb = self.emb.get_vector("<sos>")
+            while word != '<eos>':
+                hx_enc, cx_enc = self.lstm_enc(input_emb, (hx_enc, cx_enc))
+                # Shape [1, vocab_size]
+                lang_logit = self.linear_lang_gen(hx_enc)
+                encoder_output_logits.append(lang_logit)
 
-        actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
+                next_idx = torch.argmax(lang_logit)
+                next_word = self.emb.vocab[next_idx]
+                word = next_word
 
-        return (encoder_output_vectors, encoder_output_logits), critic_out, actor_out, (hx, cx)
+
+        return encoder_output_logits
 
 
+if __name__ == "__main__":
+
+    model_name = "trial_lm"
+
+    save_dir = "./pre_trained_lang_model"
+    save_path = os.path.join(save_dir, model_name)
+    data_path = "../montezuma_data/annotations.txt"
+    emb_path = "../emb/glove_twitter_25d_changed.txt"
+    instructions, vocab = read_mr_instructions(data_path)
+    emb = Embedding(emb_path, vocab)
+    vocab_size = len(emb.vocab)
+
+    model = LangModel(emb).cuda()
+    optimizer = optim.Adam(model.parameters())
+
+
+    # while True:
+    for step in range(MAX_ITER):
+        # Sample and prepare input
+        sample_idx = random.randrange(0, len(instructions))
+        sample = instructions[sample_idx]
+        input_one_hot = []
+        for w in sample:
+            one_hot = to_one_hot(emb.get_index(w), vocab_size)
+            input_one_hot.append(one_hot)
+            if w == "<eos>":
+                break
+        input_one_hot = torch.from_numpy(np.array(input_one_hot)).to(dtype=torch.float).cuda()
+
+        # Predict
+        logits = model(input_one_hot)
+
+        # Calculate loss
+        loss = 0
+
+        for logit in logits:
+            target_class = torch.argmax(logit).cuda()
+            loss += torch.nn.functional.cross_entropy(logit, target_class.unsqueeze(0))
+        loss /= len(logits)
+
+        loss.backward()
+        optimizer.step()
+        model.zero_grad()
+
+        for i in range(len(instructions)):
+            sent = instructions[i]
+            if 'slighly' in sent:
+                print("hhhhhhhhhhhhhhhhh")
+
+        if step % 100 == 0:
+            print("Loss at step {}: {}".format(step, loss))
+
+            state_to_save = model.state_dict()
+            torch.save(state_to_save, save_path)
 

@@ -13,6 +13,10 @@ Done. Loss function update
 -. Try probabilistic generation during eval
 -. Pre-train language model separately
 
+-. Evaluate generated language! Use N-gram log probability
+-. Compare with previous ones
+-. Produce graph from log
+
 Last resort:
 Building the vocabulary from the instructions alone
 

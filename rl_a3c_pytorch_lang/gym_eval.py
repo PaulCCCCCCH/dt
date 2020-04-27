@@ -55,19 +55,6 @@ if args.use_full_emb:
 else:
     emb = Embedding(args.emb_path, specific_vocab)
 
-# Append special words to the embedding model
-direction = np.zeros(args.emb_dim)
-direction[0] = 1
-emb.add("<eos>", direction)  # ignore the warning here
-direction[0] = 0
-direction[1] = 1
-emb.add("<pad>", direction)
-direction[1] = 0
-direction[2] = 1
-emb.add("<oov>", direction)
-direction[2] = 0
-direction[3] = 1
-emb.add("<sos>", direction)
 
 env = atari_env("{}".format(args.env), env_conf, args)
 num_tests = 0

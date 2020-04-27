@@ -45,6 +45,20 @@ class Embedding:
 
         self.emb_mat = np.array(emb)
 
+        # Append special words to the embedding model
+        direction = np.zeros(args.emb_dim)
+        direction[0] = 1
+        self.add("<eos>", direction)  # ignore the warning here
+        direction[0] = 0
+        direction[1] = 1
+        self.add("<pad>", direction)
+        direction[1] = 0
+        direction[2] = 1
+        self.add("<oov>", direction)
+        direction[2] = 0
+        direction[3] = 1
+        self.add("<sos>", direction)
+
     @property
     def index2entity(self):
         return self.vocab
