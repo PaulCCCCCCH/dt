@@ -2,6 +2,7 @@ from __future__ import division
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
 
 from embedding import Embedding
 from utils import norm_col_init, weights_init, find_closest
@@ -159,6 +160,13 @@ class A3Clstm(torch.nn.Module):
             encoder_output_vectors = None
             encoder_output_logits = None
 
+        r = random.random()
+        if r < 0.33:
+            self.alpha = 1
+        elif r < 0.67:
+            self.alpha = 0.5
+        else:
+            self.alpha = 0
         actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
 
         return (encoder_output_vectors, encoder_output_logits), critic_out, actor_out, (hx, cx)
