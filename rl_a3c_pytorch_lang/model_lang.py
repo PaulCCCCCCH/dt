@@ -2,6 +2,8 @@ from __future__ import division
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from embedding import Embedding
 from utils import norm_col_init, weights_init, find_closest
 from params import args
 
@@ -11,13 +13,8 @@ EMB_DIM = args.emb_dim
 
 class A3Clstm(torch.nn.Module):
     def __init__(self, num_inputs, action_space, emb):
-        self.alpha = 0.5 # Weight for language component
-        self.emb = emb
-        self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()
-        if USE_LANGUAGE:
-            self.emb_mat.requires_grad = True
-
         super(A3Clstm, self).__init__()
+
         self.conv1 = nn.Conv2d(num_inputs, 32, 5, stride=1, padding=2)
         self.maxp1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 32, 5, stride=1, padding=1)
@@ -35,6 +32,10 @@ class A3Clstm(torch.nn.Module):
         num_outputs = action_space.n
 
         if USE_LANGUAGE:
+            self.alpha = 0.5  # Weight for language component
+            self.emb = emb
+            self.emb_mat = torch.nn.Parameter(torch.from_numpy(emb.emb_mat).to(dtype=self.lstm.bias_hh.dtype), requires_grad=True)
+            # self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()
 
             # LSTM for encoding state into language for actor
             self.lstm_enc = nn.LSTMCell(args.lstm_size, args.lstm_size)
@@ -161,3 +162,4 @@ class A3Clstm(torch.nn.Module):
         actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
 
         return (encoder_output_vectors, encoder_output_logits), critic_out, actor_out, (hx, cx)
+

@@ -38,7 +38,14 @@ def ensure_shared_grads(model, shared_model, gpu=False):
         print(shared_param)
         print(shared_param.grad)
         print(shared_param._grad)
+        print(param.grad)
         print("***************")
+        """
+        """
+        print(shared_param)
+        print(param)
+        print(shared_param.shape)
+        print(param.shape)
         """
         if shared_param.grad is not None and not gpu:
             return

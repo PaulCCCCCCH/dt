@@ -93,6 +93,8 @@ if gpu_id >= 0:
         player.model = player.model.cuda()
 
 player.model.eval()
+
+
 for i_episode in range(args.num_episodes):
     player.state = player.env.reset()
     player.state = torch.from_numpy(player.state).float()

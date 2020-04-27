@@ -29,7 +29,6 @@ class Agent(object):
         self.info = None
         self.reward = 0
         self.gpu_id = -1
-
     # Run a step and save observations in the lists. These will be
     # fetched for updating weights in the future.
     def action_train(self):
