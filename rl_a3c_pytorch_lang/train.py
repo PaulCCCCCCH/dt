@@ -85,7 +85,8 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams, instruct
 
         # Make a step and record observations. Repeat until num_steps reached or game is over.
         for step in range(args.num_steps):
-            if not args.manual_control:
+            # Random period alpha (Changing alpha only after running for a period)
+            if step % 100 == 0:
                 r = random.random()
                 if r < 0.33:
                     player.model.alpha = 1
