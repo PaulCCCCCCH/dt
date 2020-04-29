@@ -11,12 +11,13 @@ def is_alpha(word):
 
 
 class Embedding:
-    def __init__(self, emb_path, specific_vocab=None):
-        self.emb_dim = 25
+    def __init__(self, emb_path=None, specific_vocab=None):
+        self.emb_dim = args.emb_dim
         self.emb_to_load = args.emb_to_load
         self.vocab = []
         self.emb_mat = None
         self._specific_vocab = specific_vocab
+        self._specific_vocab_set = set(specific_vocab)
         self._word_indices = dict()
         self._load_embedding(emb_path)
 
@@ -24,21 +25,29 @@ class Embedding:
         count = 0
         emb = []
 
-        with open(emb_path, 'r') as f:
-            for line in f:
-                s = line.split()
-                if count >= self.emb_to_load and self._specific_vocab is None:
-                    break
+        if emb_path is not None:
+            with open(emb_path, 'r') as f:
+                for line in f:
+                    s = line.split()
+                    if count >= self.emb_to_load and self._specific_vocab is None:
+                        break
 
-                if count >= self.emb_to_load:
-                    if s[0] not in self._specific_vocab:
-                        continue
+                    if count >= self.emb_to_load:
+                        if s[0] not in self._specific_vocab_set:
+                            continue
 
-                if is_alpha(s[0]):
-                    self.vocab.append(s[0])
-                    self._word_indices[s[0]] = count
-                    emb.append(np.asarray(s[1:], dtype=np.float32))
-                    count += 1
+                    if is_alpha(s[0]):
+                        self.vocab.append(s[0])
+                        self._word_indices[s[0]] = count
+                        emb.append(np.asarray(s[1:], dtype=np.float32))
+                        count += 1
+        else:
+            assert self._specific_vocab is not None
+            for v in self._specific_vocab:
+                self.vocab.append(v)
+                self._word_indices[v] = count
+                emb.append(np.random.randn(self.emb_dim))
+                count += 1
 
         for index, word in enumerate(self.vocab):
             self._word_indices[word] = index

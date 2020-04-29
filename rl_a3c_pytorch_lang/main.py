@@ -16,6 +16,7 @@ import time
 from embedding import Embedding
 import numpy as np
 from params import args
+import pickle
 
 # Define arguments
 #undo_logger_setup()
@@ -57,6 +58,10 @@ if __name__ == '__main__':
     else:
         emb = Embedding(args.emb_path, specific_vocab)
 
+    if args.use_lm:
+        with open("./pre_trained_lang_model/language_model_25d_emb.pkl", "rb") as f:
+            emb = pickle.load(f)
+
 
     # Creates a shared model and load from checkpoint
     shared_model = A3Clstm(env.observation_space.shape[0], env.action_space, emb)
@@ -70,7 +75,21 @@ if __name__ == '__main__':
         for k, v in saved_state.items():
             model_state_dict.update({k: v})
         shared_model.load_state_dict(model_state_dict)
+
+    # Loading pre-trained language model
+    if args.use_lm:
+        # Get the (var, val) dict
+        saved_state = torch.load(
+            "./pre_trained_lang_model/language_model_25d.dat",
+            map_location=lambda storage, loc: storage)
+        # Restore the variable dictionary
+        model_state_dict = shared_model.state_dict()
+        for k, v in saved_state.items():
+            model_state_dict.update({k: v})
+        shared_model.load_state_dict(model_state_dict)
+
     shared_model.share_memory()
+
 
     if args.shared_optimizer:
         if args.optimizer == 'RMSprop':

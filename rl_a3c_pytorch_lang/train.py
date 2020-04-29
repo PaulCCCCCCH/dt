@@ -85,6 +85,14 @@ def train(rank, args, shared_model, optimizer, env_conf, emb, bi_grams, instruct
 
         # Make a step and record observations. Repeat until num_steps reached or game is over.
         for step in range(args.num_steps):
+            if not args.manual_control:
+                r = random.random()
+                if r < 0.33:
+                    player.model.alpha = 1
+                elif r < 0.67:
+                    player.model.alpha = 0.5
+                else:
+                    player.model.alpha = 0
             player.action_train()
             if player.done:
                 break

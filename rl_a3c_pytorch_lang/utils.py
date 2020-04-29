@@ -166,9 +166,8 @@ def read_mr_instructions(path):
             sentence = parts[1]
             sent_words = [w.strip('.,!?/').lower() for w in sentence.split()]
             sent_words.append("<eos>")
-            while len(sent_words) < 20:
-                sent_words.append("<pad>")
 
+            # print(sent_words)
             # Adding words in the instructions to the vocabulary
             for w in sent_words:
                 vocab_set.add(w)
@@ -183,6 +182,8 @@ def to_one_hot(index, length):
     return vec
 
 
+if __name__ == "__main__":
+    ins, vocab = read_mr_instructions("../montezuma_data/annotations.txt")
 
 
 

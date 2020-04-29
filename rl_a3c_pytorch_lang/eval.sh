@@ -4,8 +4,8 @@ python gym_eval.py --env PongDeterministic-v4 --render \
 --emb-dim 25 \
 --use-language \
 --emb-to-load 0 \
+--manual-control
 # --rand-gen \
-# --manual-control
-#--use-full-emb
+# --use-full-emb
 
 

@@ -158,6 +158,23 @@ def get_args():
         default=100
     )
 
+    parser.add_argument(
+        '--use-lm',
+        action='store_true'
+    )
+
+    #########################################################
+    # The following ones are for pre-training language model#
+    #########################################################
+    parser.add_argument(
+        '--use-ckpt',
+        action='store_true'
+    )
+    parser.add_argument(
+        '--eval',
+        action='store_true'
+    )
+
     args = parser.parse_args()
     return args
 
