@@ -33,7 +33,7 @@ class A3Clstm(torch.nn.Module):
         num_outputs = action_space.n
 
         if USE_LANGUAGE:
-            self.alpha = 0.5  # Weight for language component
+            self.alpha = 1  # Weight for language component
             self.emb = emb
             self.emb_mat = torch.nn.Parameter(torch.from_numpy(emb.emb_mat).to(dtype=self.lstm.bias_hh.dtype), requires_grad=True)
             # self.emb_mat = torch.from_numpy(emb.emb_mat).float().cuda()

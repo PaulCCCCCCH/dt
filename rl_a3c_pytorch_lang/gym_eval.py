@@ -106,9 +106,9 @@ for i_episode in range(args.num_episodes):
         if player.eps_len % 5 == 0 and args.manual_control:
             print("Input manual control command")
             inp = input().split()
-            final_inp = list(inp)
+            final_inp = inp
             """
-            while len(final_inp + inp) < 8:
+            while len(final_inp + inp) < 6:
                 final_inp += inp
             """
             while len(final_inp) < 10:
