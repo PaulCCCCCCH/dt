@@ -51,6 +51,8 @@ def ensure_shared_grads(model, shared_model, gpu=False):
             return
         elif not gpu:
             shared_param._grad = param.grad
+        elif param.grad is None:
+            return
         else:
             shared_param._grad = param.grad.cpu()
 
@@ -183,7 +185,8 @@ def to_one_hot(index, length):
 
 
 if __name__ == "__main__":
-    ins, vocab = read_mr_instructions("../montezuma_data/annotations.txt")
+    ins, vocab = read_mr_instructions("./data/annotations.txt")
+    # ins, vocab, _ = read_pong_instructions("./data/pong.txt")
 
 
 

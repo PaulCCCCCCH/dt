@@ -19,27 +19,19 @@
 0%%%dont extend
 0%%%dont go
 0%%%dont run
-0%%%run dont
-0%%%stay there
-0%%%there stay
 0%%%stay there
 0%%%stop moving
 0%%%cease moving
-2%%%upward up
 2%%%up
 2%%%keep going up
 2%%%keep observe going up
-2%%%upwards upward
 2%%%upward
 2%%%upwards
-2%%%upwards
 2%%%higher
-2%%%up go
 2%%%go up
 2%%%climb up
 2%%%up climb
 2%%%move upwards
-2%%%upward move upwards
 2%%%move upward
 2%%%go higher
 2%%%higher move
@@ -50,20 +42,17 @@
 2%%%to a higher location
 2%%%to a higher position
 2%%%move to a higher location
-2%%%go up ascend
 2%%%ascend
 2%%%move up
-2%%%up move
 2%%%travel up
 2%%%upwards travel
 2%%%travel upwards
-2%%%up travel
 2%%%travel up
 3%%%down
 3%%%downwards
 3%%%keep going down
 3%%%downward
-3%%%downwards downward
+3%%%downwards
 3%%%down go
 3%%%go down
 3%%%move downwards
@@ -74,8 +63,6 @@
 3%%%move lower
 3%%%propel lower
 3%%%move to a lower position
-3%%%move set to a lower position
-3%%%move a to lower position
 3%%%go to a lower position
 3%%%go to a set lower position
 3%%%go to a lower lieu

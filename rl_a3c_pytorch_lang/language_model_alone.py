@@ -67,6 +67,7 @@ class LangModel(torch.nn.Module):
             # print("Please input first word")
             # word = input()
             word = "<sos>"
+            words = []
             while word != '<eos>':
                 input_emb = torch.from_numpy(self.emb.get_vector(word)).to(dtype=torch.float).unsqueeze(0).cuda()
                 hx_enc, cx_enc = self.lstm_enc(input_emb, (hx_enc, cx_enc))
@@ -87,10 +88,11 @@ class LangModel(torch.nn.Module):
                 next_idx = np.random.choice(len(word_prob), 1, p=word_prob.numpy())[0]
 
                 next_word = self.emb.vocab[next_idx]
+                words.append(next_word)
                 word = next_word
-                print(next_word)
+                # print(next_word)
                 # time.sleep(0.1)
-
+            print(" ".join(words))
 
 
         return encoder_output_logits
@@ -98,7 +100,7 @@ class LangModel(torch.nn.Module):
 
 if __name__ == "__main__":
 
-    model_name = "language_model_50d"
+    model_name = "language_model"
 
     save_dir = "./pre_trained_lang_model"
     save_path = os.path.join(save_dir, model_name + '.dat')
@@ -196,8 +198,8 @@ if __name__ == "__main__":
         model.load_state_dict(state_to_load)
         model.eval()
 
-        inputs = torch.randn(1, vocab_size)
-        logits = model(inputs)
-        sent = [emb.vocab[torch.argmax(logit)] for logit in logits]
-
-        print(sent)
+        for _ in range(100):
+            inputs = torch.randn(1, vocab_size)
+            logits = model(inputs)
+            sent = [emb.vocab[torch.argmax(logit)] for logit in logits]
+            # print(sent)

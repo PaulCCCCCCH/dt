@@ -160,8 +160,6 @@ class A3Clstm(torch.nn.Module):
             encoder_output_vectors = None
             encoder_output_logits = None
 
-        # Random step alpha (Changing alpha value in every step)
-        """
         if not args.manual_control:
             r = random.random()
             if r < 0.33:
@@ -170,7 +168,6 @@ class A3Clstm(torch.nn.Module):
                 self.alpha = 0.5
             else:
                 self.alpha = 0
-        """
 
         actor_out = self.alpha * actor_lang + (1 - self.alpha) * actor_fc
 

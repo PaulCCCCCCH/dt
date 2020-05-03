@@ -114,7 +114,7 @@ def get_args():
         metavar='SMD',
         help='folder to save trained models')
     parser.add_argument(
-        '--emb-path', default='../emb/model.bin', metavar='EP', help='embedding file to load')
+        '--emb-path', default='', metavar='EP', help='embedding file to load')
     parser.add_argument(
         '--gpu-ids',
         type=int,
@@ -159,8 +159,15 @@ def get_args():
     )
 
     parser.add_argument(
-        '--use-lm',
-        action='store_true'
+        '--lm-dir',
+        default='',
+        help="Directory of the pretrained language model"
+    )
+    parser.add_argument(
+        '--alpha-mode',
+        default='none',
+        choices=["none", "step", "period", "episode"],
+        help='Mode of randomising alpha'
     )
 
     #########################################################

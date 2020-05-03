@@ -13,6 +13,7 @@ import time
 import numpy as np
 from embedding import Embedding
 from params import args
+import pickle
 
 #undo_logger_setup()
 
@@ -51,10 +52,14 @@ if args.use_full_emb:
 
     emb = gensim.models.KeyedVectors.load_word2vec_format(args.emb_path, binary=True, limit=10000)
 
+elif args.lm_dir:
+    with open(os.path.join(args.lm_dir, "language_model_emb.pkl"), "rb") as f:
+        emb = pickle.load(f)
 
-else:
+elif args.emb_path:
     emb = Embedding(args.emb_path, specific_vocab)
-
+else:
+    emb = None
 
 env = atari_env("{}".format(args.env), env_conf, args)
 num_tests = 0
@@ -74,13 +79,15 @@ if gpu_id >= 0:
 else:
     player.model.load_state_dict(saved_state)
 
+emb.emb_mat = player.model.emb_mat.data.cpu().numpy()
+
 player.gpu_id = gpu_id
 if gpu_id >= 0:
     with torch.cuda.device(gpu_id):
         player.model = player.model.cuda()
 
 player.model.eval()
-
+print(player.model.emb_mat.shape)
 
 for i_episode in range(args.num_episodes):
     player.state = player.env.reset()
@@ -90,19 +97,24 @@ for i_episode in range(args.num_episodes):
             player.state = player.state.cuda()
     player.eps_len += 2
     reward_sum = 0
+    manual_language_input = None
     while True:
         if args.render:
             if i_episode % args.render_freq == 0:
                 player.env.render()
-        manual_language_input = None
-        if args.manual_control:
-        # if player.eps_len % 50 == 0 and args.manual_control:
+        # if args.manual_control:
+        if player.eps_len % 5 == 0 and args.manual_control:
             print("Input manual control command")
-            manual_language_input = input()
-            manual_language_input += " <eos>"
-            manual_language_input = manual_language_input.split()
-            while len(manual_language_input) < 10:
-                manual_language_input.append("<pad>")
+            inp = input().split()
+            final_inp = list(inp)
+            """
+            while len(final_inp + inp) < 8:
+                final_inp += inp
+            """
+            while len(final_inp) < 10:
+                final_inp.append("<eos>")
+            manual_language_input = final_inp
+            print(final_inp)
 
         player.action_test(manual_language_input)
         reward_sum += player.reward
